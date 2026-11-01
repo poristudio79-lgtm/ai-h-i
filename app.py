@@ -66,6 +66,16 @@ function playSound(type) {
         gain.gain.setValueAtTime(0.1, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
         osc.start(now); osc.stop(now + 0.2);
+    } else if (type === 'win') {
+        // Âm thanh đặc biệt khi tới vạch đích
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        osc.frequency.setValueAtTime(1046.50, now + 0.3);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now); osc.stop(now + 0.5);
     } else if (type === 'hit') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, now);
@@ -77,7 +87,7 @@ function playSound(type) {
 }
 
 // --- TRẠNG THÁI GAME ---
-let gameState = 'START'; // START, CHARACTERS, PLAYING, GAMEOVER
+let gameState = 'START';
 let score = 0;
 let highScore = localStorage.getItem('fb_highscore') || 0;
 let isNewHighScore = false;
@@ -95,12 +105,10 @@ const CHARACTERS = [
 
 const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
 const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
-
-// Nút ở màn hình Game Over
 const gameOverPlayBtn = { x: 95, y: 440, w: 130, h: 60 };
 const gameOverMenuBtn = { x: 255, y: 440, w: 130, h: 60 };
 
-// --- HÀM VẼ NHÂN VẬT PIXEL SIÊU RÕ NÉT ---
+// --- HÀM VẼ NHÂN VẬT PIXEL ---
 function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
     ctx.save();
     ctx.translate(x, y);
@@ -171,45 +179,30 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
 // --- ĐỐI TƯỢNG CHIM ---
 const bird = {
     x: 90, y: 250, radius: 14, gravity: 0.28, jumpForce: -5.2, velocity: 0,
-    
     draw() {
         let rotation = Math.min(Math.PI / 2.5, Math.max(-Math.PI / 4, (this.velocity / 12)));
         drawPixelBird(this.x, this.y, selectedSkin, 2.2, rotation);
     },
-
     update() {
         this.velocity += this.gravity;
         this.y += this.velocity;
-
-        if (this.y - this.radius <= 0) {
-            this.y = this.radius;
-            this.velocity = 0;
-        }
-
+        if (this.y - this.radius <= 0) { this.y = this.radius; this.velocity = 0; }
         if (this.y + this.radius >= canvas.height - 80) {
             this.y = canvas.height - 80 - this.radius;
             triggerGameOver();
         }
     },
-
-    jump() {
-        this.velocity = this.jumpForce;
-        playSound('jump');
-    },
-
-    reset() {
-        this.y = 250;
-        this.velocity = 0;
-    }
+    jump() { this.velocity = this.jumpForce; playSound('jump'); },
+    reset() { this.y = 250; this.velocity = 0; }
 };
 
-// --- QUẢN LÝ ỐNG CỐNG ---
+// --- QUẢN LÝ ỐNG CỐNG & CỘT VẠCH ĐÍCH ---
 const pipes = {
-    items: [], gap: 130, width: 56, speed: 2.2,
+    items: [], gap: 130, width: 56, speed: 2.2, pipeCount: 0,
     draw() {
         this.items.forEach(p => {
-            drawSinglePipe(p.x, 0, this.width, p.top, true);
-            drawSinglePipe(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false);
+            drawSinglePipe(p.x, 0, this.width, p.top, true, p.isFinish);
+            drawSinglePipe(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false, p.isFinish);
         });
     },
     update() {
@@ -217,7 +210,18 @@ const pipes = {
             let maxTop = canvas.height - 80 - this.gap - 50;
             let minTop = 50;
             let top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
-            this.items.push({ x: canvas.width, top: top, bottom: top + this.gap, passed: false });
+            
+            this.pipeCount++;
+            // Nếu là cột thứ 9 (sau khi vượt qua 8 cột đầu tiên) thì biến thành cột vạch đích
+            let isFinish = (this.pipeCount === 9);
+
+            this.items.push({ 
+                x: canvas.width, 
+                top: top, 
+                bottom: top + this.gap, 
+                passed: false, 
+                isFinish: isFinish 
+            });
         }
         this.items.forEach((p, index) => {
             p.x -= this.speed;
@@ -228,7 +232,14 @@ const pipes = {
                 triggerGameOver();
             }
             if (p.x + this.width < bird.x && !p.passed) {
-                p.passed = true; score++; playSound('score');
+                p.passed = true; score++; 
+                
+                if (p.isFinish) {
+                    playSound('win');
+                } else {
+                    playSound('score');
+                }
+
                 if (score > highScore) { 
                     highScore = score; 
                     isNewHighScore = true;
@@ -238,20 +249,22 @@ const pipes = {
             if (p.x + this.width < 0) this.items.splice(index, 1);
         });
     },
-    reset() { this.items = []; }
+    reset() { this.items = []; this.pipeCount = 0; }
 };
 
-function drawSinglePipe(x, y, width, height, isTop) {
+// --- HÀM VẼ CỘT (HỖ TRỢ CỘT VẠCH ĐÍCH ĐẶC BIỆT) ---
+function drawSinglePipe(x, y, width, height, isTop, isFinish) {
     const rimHeight = 28;
     const rimExtraWidth = 6;
     const rimX = x - rimExtraWidth / 2;
     const rimW = width + rimExtraWidth;
 
-    const colDarkBorder = '#232b1a';
-    const colMainGreen  = '#75cb27';
-    const colLightGreen = '#b8e637';
-    const colWhiteLine  = '#ffffff';
-    const colDarkGreen  = '#549c1b';
+    // Màu sắc: Nếu là cột vạch đích -> Đổi sang màu Vàng Kim / Cam rực rỡ
+    const colDarkBorder = isFinish ? '#3a2000' : '#232b1a';
+    const colMainGreen  = isFinish ? '#f8b000' : '#75cb27';
+    const colLightGreen = isFinish ? '#ffe066' : '#b8e637';
+    const colWhiteLine  = isFinish ? '#ffffff' : '#ffffff';
+    const colDarkGreen  = isFinish ? '#d48800' : '#549c1b';
 
     ctx.save();
 
@@ -270,6 +283,12 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillStyle = colDarkGreen; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
         ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
         ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, rimY + rimHeight, width, 4);
+
+        // Thêm họa tiết vạch đích (Dải băng sọc đỏ/trắng) trên đỉnh cột nếu là cột đích
+        if (isFinish) {
+            ctx.fillStyle = '#e82828';
+            ctx.fillRect(rimX, rimY + 8, rimW, 6);
+        }
     } else {
         let rimY = y;
         let bodyY = y + rimHeight;
@@ -286,6 +305,11 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillStyle = colDarkGreen; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
         ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
         ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, bodyY, width, 4);
+
+        if (isFinish) {
+            ctx.fillStyle = '#e82828';
+            ctx.fillRect(rimX, rimY + 8, rimW, 6);
+        }
     }
     ctx.restore();
 }
@@ -418,9 +442,7 @@ function drawCharacterMenu() {
     ctx.fillText('BẮT ĐẦU CHƠI', canvas.width / 2, 558);
 }
 
-// --- VẼ MÀN HÌNH GAME OVER CHUẨN PIXEL ---
 function drawGameOverScreen() {
-    // 1. Chữ GAME OVER nổi 3D
     ctx.save();
     ctx.font = '900 46px "Courier New", sans-serif';
     ctx.textAlign = 'center';
@@ -431,100 +453,56 @@ function drawGameOverScreen() {
     ctx.fillText('GAME OVER', canvas.width / 2, 140);
     ctx.restore();
 
-    // 2. Bảng Báo Điểm 3D (Scoreboard)
     let pbX = 60, pbY = 180, pbW = 360, pbH = 220;
+    ctx.fillStyle = '#ded895'; ctx.fillRect(pbX, pbY, pbW, pbH);
+    ctx.strokeStyle = '#3a2810'; ctx.lineWidth = 6; ctx.strokeRect(pbX, pbY, pbW, pbH);
 
-    // Viền đen và Nền vàng nhạt
-    ctx.fillStyle = '#ded895';
-    ctx.fillRect(pbX, pbY, pbW, pbH);
-    ctx.strokeStyle = '#3a2810';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(pbX, pbY, pbW, pbH);
+    ctx.strokeStyle = '#f8f0c0'; ctx.lineWidth = 3; ctx.strokeRect(pbX + 4, pbY + 4, pbW - 8, pbH - 8);
 
-    ctx.strokeStyle = '#f8f0c0';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(pbX + 4, pbY + 4, pbW - 8, pbH - 8);
-
-    // VẼ HUY CHƯƠNG (MEDAL)
-    ctx.fillStyle = '#3a2810';
-    ctx.font = 'bold 16px "Courier New"';
-    ctx.textAlign = 'left';
+    ctx.fillStyle = '#3a2810'; ctx.font = 'bold 16px "Courier New"'; ctx.textAlign = 'left';
     ctx.fillText('MEDAL', pbX + 35, pbY + 50);
 
     let medalX = pbX + 60;
     let medalY = pbY + 115;
     
-    // Vẽ khung tròn huy chương
-    ctx.beginPath();
-    ctx.arc(medalX, medalY, 32, 0, Math.PI * 2);
-    ctx.fillStyle = '#3a2810';
-    ctx.fill();
-    ctx.lineWidth = 3;
-    ctx.stroke();
+    ctx.beginPath(); ctx.arc(medalX, medalY, 32, 0, Math.PI * 2);
+    ctx.fillStyle = '#3a2810'; ctx.fill(); ctx.lineWidth = 3; ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(medalX, medalY, 28, 0, Math.PI * 2);
-
-    if (score >= 30) {
-        ctx.fillStyle = '#40e0d0'; // Bạch kim/Kim cương
-    } else if (score >= 20) {
-        ctx.fillStyle = '#f8d038'; // Vàng
-    } else if (score >= 10) {
-        ctx.fillStyle = '#d0d0d0'; // Bạc
-    } else if (score >= 5) {
-        ctx.fillStyle = '#cc7722'; // Đồng
-    } else {
-        ctx.fillStyle = '#8a795d'; // Không đạt
-    }
+    ctx.beginPath(); ctx.arc(medalX, medalY, 28, 0, Math.PI * 2);
+    if (score >= 30) { ctx.fillStyle = '#40e0d0'; } 
+    else if (score >= 20) { ctx.fillStyle = '#f8d038'; } 
+    else if (score >= 10) { ctx.fillStyle = '#d0d0d0'; } 
+    else if (score >= 5) { ctx.fillStyle = '#cc7722'; } 
+    else { ctx.fillStyle = '#8a795d'; }
     ctx.fill();
 
-    // Lồng ngôi sao nhỏ giữa huy chương
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(medalX, medalY, 10, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(medalX, medalY, 10, 0, Math.PI * 2); ctx.fill();
 
-    // HIỂN THỊ ĐIỂM SỐ (SCORE & BEST)
     ctx.textAlign = 'right';
-
-    // Nhãn SCORE
-    ctx.fillStyle = '#f85820';
-    ctx.font = 'bold 16px "Courier New"';
+    ctx.fillStyle = '#f85820'; ctx.font = 'bold 16px "Courier New"';
     ctx.fillText('SCORE', pbX + pbW - 35, pbY + 45);
 
-    ctx.fillStyle = '#000000';
-    ctx.font = '900 32px "Courier New"';
+    ctx.fillStyle = '#000000'; ctx.font = '900 32px "Courier New"';
     ctx.fillText(score, pbX + pbW - 35, pbY + 85);
 
-    // Nhãn BEST
-    ctx.fillStyle = '#f85820';
-    ctx.font = 'bold 16px "Courier New"';
+    ctx.fillStyle = '#f85820'; ctx.font = 'bold 16px "Courier New"';
     ctx.fillText('BEST', pbX + pbW - 35, pbY + 130);
 
-    ctx.fillStyle = '#000000';
-    ctx.font = '900 32px "Courier New"';
+    ctx.fillStyle = '#000000'; ctx.font = '900 32px "Courier New"';
     ctx.fillText(highScore, pbX + pbW - 35, pbY + 170);
 
-    // Ký hiệu "NEW" nhấp nháy nếu phá kỷ lục
     if (isNewHighScore && Math.floor(frames / 15) % 2 === 0) {
-        ctx.fillStyle = '#e82828';
-        ctx.font = '900 14px "Courier New"';
+        ctx.fillStyle = '#e82828'; ctx.font = '900 14px "Courier New"';
         ctx.fillText('NEW!', pbX + pbW - 130, pbY + 165);
     }
 
-    // 3. NÚT CHƠI LẠI (OK / PLAY) & MENU
-    // Nút Play lại
-    ctx.fillStyle = '#54cb37';
-    ctx.fillRect(gameOverPlayBtn.x, gameOverPlayBtn.y, gameOverPlayBtn.w, gameOverPlayBtn.h);
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
-    ctx.strokeRect(gameOverPlayBtn.x, gameOverPlayBtn.y, gameOverPlayBtn.w, gameOverPlayBtn.h);
+    ctx.fillStyle = '#54cb37'; ctx.fillRect(gameOverPlayBtn.x, gameOverPlayBtn.y, gameOverPlayBtn.w, gameOverPlayBtn.h);
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.strokeRect(gameOverPlayBtn.x, gameOverPlayBtn.y, gameOverPlayBtn.w, gameOverPlayBtn.h);
     
     ctx.fillStyle = '#fff'; ctx.font = 'bold 20px "Courier New"'; ctx.textAlign = 'center';
-    ctx.fillText('CHƠI LAỊ', gameOverPlayBtn.x + gameOverPlayBtn.w / 2, gameOverPlayBtn.y + 36);
+    ctx.fillText('CHƠI LẠI', gameOverPlayBtn.x + gameOverPlayBtn.w / 2, gameOverPlayBtn.y + 36);
 
-    // Nút Về Menu
-    ctx.fillStyle = '#f88020';
-    ctx.fillRect(gameOverMenuBtn.x, gameOverMenuBtn.y, gameOverMenuBtn.w, gameOverMenuBtn.h);
+    ctx.fillStyle = '#f88020'; ctx.fillRect(gameOverMenuBtn.x, gameOverMenuBtn.y, gameOverMenuBtn.w, gameOverMenuBtn.h);
     ctx.strokeRect(gameOverMenuBtn.x, gameOverMenuBtn.y, gameOverMenuBtn.w, gameOverMenuBtn.h);
 
     ctx.fillStyle = '#fff'; ctx.font = 'bold 20px "Courier New"';
@@ -547,10 +525,7 @@ function drawUI() {
 }
 
 function triggerGameOver() {
-    if (gameState !== 'GAMEOVER') { 
-        playSound('hit'); 
-        gameState = 'GAMEOVER'; 
-    }
+    if (gameState !== 'GAMEOVER') { playSound('hit'); gameState = 'GAMEOVER'; }
 }
 
 function loop() {
@@ -574,7 +549,6 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-// --- TƯƠNG TÁC ĐIỀU KHIỂN ---
 function handleInteraction(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
@@ -616,14 +590,12 @@ function handleInteraction(clientX, clientY) {
         bird.jump();
     } 
     else if (gameState === 'GAMEOVER') {
-        // Nút Chơi Lại
         if (clickX >= gameOverPlayBtn.x && clickX <= gameOverPlayBtn.x + gameOverPlayBtn.w &&
             clickY >= gameOverPlayBtn.y && clickY <= gameOverPlayBtn.y + gameOverPlayBtn.h) {
             bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
             gameState = 'PLAYING'; bird.jump();
             return;
         }
-        // Nút Về Menu
         if (clickX >= gameOverMenuBtn.x && clickX <= gameOverMenuBtn.x + gameOverMenuBtn.w &&
             clickY >= gameOverMenuBtn.y && clickY <= gameOverMenuBtn.y + gameOverMenuBtn.h) {
             bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
