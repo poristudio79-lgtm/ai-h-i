@@ -81,7 +81,7 @@ let gameState = 'START'; // START, CHARACTERS, PLAYING, GAMEOVER
 let score = 0;
 let highScore = localStorage.getItem('fb_highscore') || 0;
 let frames = 0;
-let selectedSkin = 1; // Mặc định là OHINH
+let selectedSkin = 1;
 
 const CHARACTERS = [
     { id: 0, name: 'GBI', color: '#e82878' },
@@ -92,14 +92,14 @@ const CHARACTERS = [
     { id: 5, name: 'NARWHAL', color: '#20b2aa' }
 ];
 
-// Nút bấm trên Menu chính
 const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
 const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
 
 // --- HÀM VẼ NHÂN VẬT PIXEL ---
-function drawPixelBird(x, y, skinId, scale = 2) {
+function drawPixelBird(x, y, skinId, scale = 2, rotation = 0) {
     ctx.save();
     ctx.translate(x, y);
+    ctx.rotate(rotation); // Xoay góc theo hiệu ứng bay lên/rơi xuống
     const p = scale;
 
     if (skinId === 0) {
@@ -163,120 +163,49 @@ function drawPixelBird(x, y, skinId, scale = 2) {
     ctx.restore();
 }
 
-// --- CHIM ---
+// --- ĐỐI TƯỢNG CHIM VỚI HIỆU ỨNG RƠI / BAY ---
 const bird = {
-    x: 80, y: 250, radius: 12, gravity: 0.25, jumpForce: -4.6, velocity: 0,
+    x: 90, y: 250, radius: 12, gravity: 0.28, jumpForce: -5.2, velocity: 0,
+    
     draw() {
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        let rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (this.velocity / 10)));
-        ctx.rotate(rotation);
-        ctx.restore();
-
-        drawPixelBird(this.x, this.y, selectedSkin, 1.8);
+        // Tính góc xoay đầu chim dựa trên vận tốc (Bay lên ngẩng đầu, Rơi xuống cắm đầu)
+        let rotation = Math.min(Math.PI / 2.5, Math.max(-Math.PI / 4, (this.velocity / 12)));
+        drawPixelBird(this.x, this.y, selectedSkin, 1.8, rotation);
     },
+
     update() {
+        // Hiệu ứng rơi xuống: Tăng dần vận tốc theo trọng lực
         this.velocity += this.gravity;
         this.y += this.velocity;
-        if (this.y - this.radius <= 0) { this.y = this.radius; this.velocity = 0; }
+
+        // Giới hạn trần màn hình
+        if (this.y - this.radius <= 0) {
+            this.y = this.radius;
+            this.velocity = 0;
+        }
+
+        // Chạm đất -> Game Over
         if (this.y + this.radius >= canvas.height - 80) {
             this.y = canvas.height - 80 - this.radius;
             triggerGameOver();
         }
     },
-    jump() { this.velocity = this.jumpForce; playSound('jump'); },
-    reset() { this.y = 250; this.velocity = 0; }
-};
 
-// --- HÀM VẼ ĐƯỜNG ỐNG CỐNG PIXEL ART ---
-function drawSinglePipe(x, y, width, height, isTop) {
-    const rimHeight = 28;
-    const rimExtraWidth = 6;
-    const rimX = x - rimExtraWidth / 2;
-    const rimW = width + rimExtraWidth;
+    jump() {
+        // Hiệu ứng bay lên: Gán lực âm để đẩy chim vọt lên cao lập tức
+        this.velocity = this.jumpForce;
+        playSound('jump');
+    },
 
-    const colDarkBorder = '#232b1a';
-    const colMainGreen  = '#75cb27';
-    const colLightGreen = '#b8e637';
-    const colWhiteLine  = '#ffffff';
-    const colDarkGreen  = '#549c1b';
-
-    ctx.save();
-
-    if (isTop) {
-        let bodyH = Math.max(0, height - rimHeight);
-
-        ctx.fillStyle = colMainGreen;
-        ctx.fillRect(x, 0, width, bodyH);
-        ctx.fillStyle = colLightGreen;
-        ctx.fillRect(x + 4, 0, 10, bodyH);
-        ctx.fillStyle = colWhiteLine;
-        ctx.fillRect(x + 14, 0, 4, bodyH);
-        ctx.fillStyle = colDarkGreen;
-        ctx.fillRect(x + width - 12, 0, 12, bodyH);
-
-        ctx.strokeStyle = colDarkBorder;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x, 0, width, bodyH);
-
-        let rimY = bodyH;
-        ctx.fillStyle = colMainGreen;
-        ctx.fillRect(rimX, rimY, rimW, rimHeight);
-        ctx.fillStyle = colLightGreen;
-        ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-        ctx.fillStyle = colWhiteLine;
-        ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-        ctx.fillStyle = colDarkGreen;
-        ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-
-        ctx.strokeStyle = colDarkBorder;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(rimX, rimY, rimW, rimHeight);
-
-        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-        ctx.fillRect(x, rimY + rimHeight, width, 4);
-
-    } else {
-        let rimY = y;
-        let bodyY = y + rimHeight;
-        let bodyH = Math.max(0, canvas.height - bodyY);
-
-        ctx.fillStyle = colMainGreen;
-        ctx.fillRect(x, bodyY, width, bodyH);
-        ctx.fillStyle = colLightGreen;
-        ctx.fillRect(x + 4, bodyY, 10, bodyH);
-        ctx.fillStyle = colWhiteLine;
-        ctx.fillRect(x + 14, bodyY, 4, bodyH);
-        ctx.fillStyle = colDarkGreen;
-        ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
-
-        ctx.strokeStyle = colDarkBorder;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(x, bodyY, width, bodyH);
-
-        ctx.fillStyle = colMainGreen;
-        ctx.fillRect(rimX, rimY, rimW, rimHeight);
-        ctx.fillStyle = colLightGreen;
-        ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-        ctx.fillStyle = colWhiteLine;
-        ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-        ctx.fillStyle = colDarkGreen;
-        ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-
-        ctx.strokeStyle = colDarkBorder;
-        ctx.lineWidth = 3;
-        ctx.strokeRect(rimX, rimY, rimW, rimHeight);
-
-        ctx.fillStyle = 'rgba(0,0,0,0.25)';
-        ctx.fillRect(x, bodyY, width, 4);
+    reset() {
+        this.y = 250;
+        this.velocity = 0;
     }
-
-    ctx.restore();
-}
+};
 
 // --- QUẢN LÝ ỐNG CỐNG ---
 const pipes = {
-    items: [], gap: 130, width: 56, speed: 2,
+    items: [], gap: 130, width: 56, speed: 2.2,
     draw() {
         this.items.forEach(p => {
             drawSinglePipe(p.x, 0, this.width, p.top, true);
@@ -284,7 +213,7 @@ const pipes = {
         });
     },
     update() {
-        if (frames % 100 === 0) {
+        if (frames % 95 === 0) {
             let maxTop = canvas.height - 80 - this.gap - 50;
             let minTop = 50;
             let top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
@@ -308,7 +237,55 @@ const pipes = {
     reset() { this.items = []; }
 };
 
-// --- NỀN THÀNH PHỐ VÀ MẶT ĐẤT CARO ---
+function drawSinglePipe(x, y, width, height, isTop) {
+    const rimHeight = 28;
+    const rimExtraWidth = 6;
+    const rimX = x - rimExtraWidth / 2;
+    const rimW = width + rimExtraWidth;
+
+    const colDarkBorder = '#232b1a';
+    const colMainGreen  = '#75cb27';
+    const colLightGreen = '#b8e637';
+    const colWhiteLine  = '#ffffff';
+    const colDarkGreen  = '#549c1b';
+
+    ctx.save();
+
+    if (isTop) {
+        let bodyH = Math.max(0, height - rimHeight);
+        ctx.fillStyle = colMainGreen; ctx.fillRect(x, 0, width, bodyH);
+        ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, 0, 10, bodyH);
+        ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
+        ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+        ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
+
+        let rimY = bodyH;
+        ctx.fillStyle = colMainGreen; ctx.fillRect(rimX, rimY, rimW, rimHeight);
+        ctx.fillStyle = colLightGreen; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
+        ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
+        ctx.fillStyle = colDarkGreen; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
+        ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, rimY + rimHeight, width, 4);
+    } else {
+        let rimY = y;
+        let bodyY = y + rimHeight;
+        let bodyH = Math.max(0, canvas.height - bodyY);
+        ctx.fillStyle = colMainGreen; ctx.fillRect(x, bodyY, width, bodyH);
+        ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, bodyY, 10, bodyH);
+        ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
+        ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
+        ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
+
+        ctx.fillStyle = colMainGreen; ctx.fillRect(rimX, rimY, rimW, rimHeight);
+        ctx.fillStyle = colLightGreen; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
+        ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
+        ctx.fillStyle = colDarkGreen; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
+        ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+        ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, bodyY, width, 4);
+    }
+    ctx.restore();
+}
+
 function drawBackgroundCity() {
     ctx.fillStyle = '#a1e4c3';
     ctx.beginPath();
@@ -332,9 +309,7 @@ function drawGround() {
     ctx.strokeStyle = '#232b1a'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(0, canvas.height - 80); ctx.lineTo(canvas.width, canvas.height - 80); ctx.stroke();
     
-    // Đất kẻ sọc caro vàng xanh chuẩn Flappy Bird gốc
     ctx.fillStyle = '#75cb27'; ctx.fillRect(0, canvas.height - 80, canvas.width, 16);
-    
     ctx.fillStyle = '#9bd843';
     for (let i = 0; i < canvas.width; i += 24) {
         ctx.beginPath();
@@ -346,97 +321,50 @@ function drawGround() {
     }
 }
 
-// --- V VẼ NÚT 3D CHUẨN MẸO HÌNH MẪU ---
 function drawMenuButton(btn, isPlayBtn) {
-    // 1. Khung ngoài Bo Góc màu trắng kem
-    ctx.fillStyle = '#f8f8f8';
-    ctx.strokeStyle = '#2b2b2b';
-    ctx.lineWidth = 4;
-    
-    ctx.beginPath();
-    ctx.roundRect(btn.x, btn.y, btn.w, btn.h, 16);
-    ctx.fill();
-    ctx.stroke();
-
-    // Đổ bóng gradient nhẹ dưới nút
-    ctx.fillStyle = 'rgba(0,0,0,0.06)';
-    ctx.beginPath();
-    ctx.roundRect(btn.x + 4, btn.y + btn.h / 2, btn.w - 8, btn.h / 2 - 4, [0, 0, 12, 12]);
-    ctx.fill();
+    ctx.fillStyle = '#f8f8f8'; ctx.strokeStyle = '#2b2b2b'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.roundRect(btn.x, btn.y, btn.w, btn.h, 16); ctx.fill(); ctx.stroke();
 
     if (isPlayBtn) {
-        // Biểu tượng tam giác XANH LÁ (Play)
         let cx = btn.x + btn.w / 2 - 4;
         let cy = btn.y + btn.h / 2;
-
         ctx.fillStyle = '#00a844';
-        ctx.beginPath();
-        ctx.moveTo(cx - 16, cy - 22);
-        ctx.lineTo(cx + 22, cy);
-        ctx.lineTo(cx - 16, cy + 22);
-        ctx.closePath();
-        ctx.fill();
-
+        ctx.beginPath(); ctx.moveTo(cx - 16, cy - 22); ctx.lineTo(cx + 22, cy); ctx.lineTo(cx - 16, cy + 22); ctx.closePath(); ctx.fill();
         ctx.fillStyle = '#54cb37';
-        ctx.beginPath();
-        ctx.moveTo(cx - 16, cy - 22);
-        ctx.lineTo(cx + 12, cy);
-        ctx.lineTo(cx - 16, cy);
-        ctx.closePath();
-        ctx.fill();
+        ctx.beginPath(); ctx.moveTo(cx - 16, cy - 22); ctx.lineTo(cx + 12, cy); ctx.lineTo(cx - 16, cy); ctx.closePath(); ctx.fill();
     } else {
-        // Biểu tượng chọn NHÂN VẬT (Thay cho BXH)
         drawPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.2);
     }
 }
 
-// --- MENU CHÍNH CHUẨN 100% THEO HÌNH MẪU ---
 function drawMainMenu() {
-    // 1. Logo FlappyBird 3D Chuẩn gốc
     let titleX = canvas.width / 2;
     let titleY = 130;
 
     ctx.save();
     ctx.font = '900 48px "Courier New", sans-serif';
     ctx.textAlign = 'center';
-
-    // Đổ bóng đen đậm
-    ctx.fillStyle = '#000000';
-    ctx.fillText('FlappyBird', titleX + 4, titleY + 4);
-
-    // Chữ trắng tinh
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText('FlappyBird', titleX, titleY);
+    ctx.fillStyle = '#000000'; ctx.fillText('FlappyBird', titleX + 4, titleY + 4);
+    ctx.fillStyle = '#ffffff'; ctx.fillText('FlappyBird', titleX, titleY);
     ctx.restore();
 
-    // 2. Chú chim nhún nhảy ở giữa màn hình
     let floatY = 230 + Math.sin(frames * 0.08) * 8;
     drawPixelBird(canvas.width / 2, floatY, selectedSkin, 2.5);
 
-    // 3. Vẽ 2 Nút bấm (Play & Chọn Nhân Vật)
     drawMenuButton(menuPlayBtn, true);
     drawMenuButton(menuCharBtn, false);
 }
 
-// --- BẢNG POPUP CHỌN NHÂN VẬT ---
 function drawCharacterMenu() {
     let panelX = 30, panelY = 40, panelW = 420, panelH = 550;
-    
-    ctx.fillStyle = '#bdebf2';
-    ctx.fillRect(panelX, panelY, panelW, panelH);
-    ctx.strokeStyle = '#2b484f';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(panelX, panelY, panelW, panelH);
+    ctx.fillStyle = '#bdebf2'; ctx.fillRect(panelX, panelY, panelW, panelH);
+    ctx.strokeStyle = '#2b484f'; ctx.lineWidth = 6; ctx.strokeRect(panelX, panelY, panelW, panelH);
 
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(panelX + 4, panelY + 4, panelW - 8, panelH - 8);
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(panelX + 4, panelY + 4, panelW - 8, panelH - 8);
 
     ctx.font = '900 36px "Courier New", sans-serif';
     ctx.textAlign = 'center';
-    
-    ctx.fillStyle = '#3a2050';
-    ctx.fillText('NHÂN VẬT', canvas.width / 2 + 3, panelY + 63);
+    ctx.fillStyle = '#3a2050'; ctx.fillText('NHÂN VẬT', canvas.width / 2 + 3, panelY + 63);
 
     const titleText = 'NHÂN VẬT';
     const colors = ['#f8d038', '#f858a8', '#38a8b8', '#9848d0', '#509848', '#f87820', '#38a8b8', '#f858a8'];
@@ -447,7 +375,6 @@ function drawCharacterMenu() {
     }
 
     const startGridX = 55, startGridY = 130, boxW = 110, boxH = 120, gapX = 20, gapY = 25;
-
     CHARACTERS.forEach((char, i) => {
         let col = i % 3;
         let row = Math.floor(i / 3);
@@ -455,46 +382,32 @@ function drawCharacterMenu() {
         let by = startGridY + row * (boxH + gapY);
         let isSelected = (selectedSkin === i);
 
-        ctx.fillStyle = '#a6e3ed';
-        ctx.fillRect(bx, by, boxW, boxH);
-
+        ctx.fillStyle = '#a6e3ed'; ctx.fillRect(bx, by, boxW, boxH);
         if (isSelected) {
-            ctx.strokeStyle = '#d49b00';
-            ctx.lineWidth = 6;
-            ctx.strokeRect(bx - 2, by - 2, boxW + 4, boxH + 4);
-            ctx.strokeStyle = '#fff7b2';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(bx, by, boxW, boxH);
+            ctx.strokeStyle = '#d49b00'; ctx.lineWidth = 6; ctx.strokeRect(bx - 2, by - 2, boxW + 4, boxH + 4);
+            ctx.strokeStyle = '#fff7b2'; ctx.lineWidth = 3; ctx.strokeRect(bx, by, boxW, boxH);
         } else {
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(bx, by, boxW, boxH);
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(bx, by, boxW, boxH);
         }
 
         drawPixelBird(bx + boxW / 2, by + 38, i, 1.8);
 
         ctx.fillStyle = isSelected ? '#d49b00' : '#457a82';
         ctx.fillRect(bx + 10, by + 72, boxW - 20, 18);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(bx + 10, by + 72, boxW - 20, 18);
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.strokeRect(bx + 10, by + 72, boxW - 20, 18);
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 10px "Courier New"';
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px "Courier New"';
         ctx.fillText(char.name, bx + boxW / 2, by + 85);
 
         ctx.fillStyle = isSelected ? '#f8b000' : '#e0f8f8';
         ctx.fillRect(bx + 20, by + 94, boxW - 40, 18);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(bx + 20, by + 94, boxW - 40, 18);
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.strokeRect(bx + 20, by + 94, boxW - 40, 18);
 
         ctx.fillStyle = isSelected ? '#ffffff' : '#000000';
         ctx.font = 'bold 11px "Courier New"';
         ctx.fillText('CHỌN', bx + boxW / 2, by + 107);
     });
 
-    // Nút BẮT ĐẦU CHƠI ở góc dưới popup
     ctx.fillStyle = '#75cb27'; ctx.fillRect(140, 530, 200, 45);
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(140, 530, 200, 45);
     ctx.fillStyle = '#fff'; ctx.font = 'bold 18px "Courier New"';
@@ -517,7 +430,7 @@ function drawUI() {
         ctx.strokeText('GAME OVER', canvas.width / 2, 180);
         ctx.fillText('GAME OVER', canvas.width / 2, 180);
 
-        drawPixelBird(canvas.width / 2, 230, selectedSkin, 2.2);
+        drawPixelBird(canvas.width / 2, 230, selectedSkin, 2.2, 0.5);
 
         ctx.font = '18px Courier New';
         ctx.strokeText(`Điểm: ${score}`, canvas.width / 2, 290);
@@ -535,40 +448,39 @@ function triggerGameOver() {
     if (gameState !== 'GAMEOVER') { playSound('hit'); gameState = 'GAMEOVER'; }
 }
 
-// --- VÒNG LẶP CHÍNH ---
 function loop() {
     ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawBackgroundCity();
 
     if (gameState === 'PLAYING') {
-        bird.update(); pipes.update();
+        bird.update();
+        pipes.update();
     }
     frames++;
 
     pipes.draw(); 
     drawGround();
 
-    if (gameState === 'PLAYING') bird.draw();
+    if (gameState === 'PLAYING') {
+        bird.draw();
+    }
     drawUI();
 
     requestAnimationFrame(loop);
 }
 
-// --- TƯƠNG TÁC ĐIỀU KHIỂN ---
 function handleInteraction(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
 
     if (gameState === 'START') {
-        // Nút Bắt Đầu (Play)
         if (clickX >= menuPlayBtn.x && clickX <= menuPlayBtn.x + menuPlayBtn.w &&
             clickY >= menuPlayBtn.y && clickY <= menuPlayBtn.y + menuPlayBtn.h) {
             bird.reset(); pipes.reset(); score = 0; frames = 0;
             gameState = 'PLAYING'; bird.jump();
             return;
         }
-        // Nút Chọn Nhân Vật
         if (clickX >= menuCharBtn.x && clickX <= menuCharBtn.x + menuCharBtn.w &&
             clickY >= menuCharBtn.y && clickY <= menuCharBtn.y + menuCharBtn.h) {
             gameState = 'CHARACTERS';
@@ -578,7 +490,6 @@ function handleInteraction(clientX, clientY) {
     } 
     else if (gameState === 'CHARACTERS') {
         const startGridX = 55, startGridY = 130, boxW = 110, boxH = 120, gapX = 20, gapY = 25;
-
         CHARACTERS.forEach((char, i) => {
             let col = i % 3; let row = Math.floor(i / 3);
             let bx = startGridX + col * (boxW + gapX);
@@ -590,7 +501,6 @@ function handleInteraction(clientX, clientY) {
             }
         });
 
-        // Nút BẮT ĐẦU CHƠI
         if (clickX >= 140 && clickX <= 340 && clickY >= 530 && clickY <= 575) {
             bird.reset(); pipes.reset(); score = 0; frames = 0;
             gameState = 'PLAYING'; bird.jump();
