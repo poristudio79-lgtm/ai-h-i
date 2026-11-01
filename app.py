@@ -179,7 +179,6 @@ function drawSkinEffects(x, y, skinId) {
     let time = frames * 0.12;
 
     if (skinId === 0) {
-        // GBI: Hào quang đôi phát sáng nhấp nháy sắc nét
         ctx.strokeStyle = 'rgba(255, 60, 150, 0.8)';
         ctx.lineWidth = 3.5;
         ctx.beginPath();
@@ -193,7 +192,6 @@ function drawSkinEffects(x, y, skinId) {
         ctx.stroke();
     } 
     else if (skinId === 1) {
-        // OHINH: Tia chớp vàng sắc lẹm xẹt ngang dọc
         if (frames % 12 < 7) {
             ctx.strokeStyle = '#ffff00';
             ctx.lineWidth = 3;
@@ -209,7 +207,6 @@ function drawSkinEffects(x, y, skinId) {
         }
     } 
     else if (skinId === 2) {
-        // HOI BINK: Lá cây mầm xanh mướt bay lượn xoay vòng
         for (let i = 0; i < 4; i++) {
             let angle = time + i * (Math.PI / 2);
             let lx = x - 18 + Math.cos(angle) * 16;
@@ -219,7 +216,6 @@ function drawSkinEffects(x, y, skinId) {
         }
     } 
     else if (skinId === 3) {
-        // KHON: Hỏa diệm tím rực cháy mãnh liệt phía sau đuôi
         let flamePulse = Math.sin(time * 3) * 4;
         ctx.fillStyle = 'rgba(248, 88, 168, 0.9)';
         ctx.beginPath();
@@ -235,7 +231,6 @@ function drawSkinEffects(x, y, skinId) {
         ctx.fillRect(x - 16, y + 4, 4, 4);
     } 
     else if (skinId === 4) {
-        // BINH: Bong bóng nước đa tầng lấp lánh phản chiếu ánh sáng
         let bx = x - 20 - ((frames * 1.8) % 40);
         let by = y + Math.sin(time * 1.5) * 14;
         
@@ -252,7 +247,6 @@ function drawSkinEffects(x, y, skinId) {
         ctx.beginPath(); ctx.arc(bx2, by2, 4, 0, Math.PI * 2); ctx.stroke();
     } 
     else if (skinId === 5) {
-        // NARWHAL: Tinh thể băng giá tuyết lấp lánh sắc nét
         for (let i = 0; i < 4; i++) {
             let tx = x - 12 - (i * 12 + (frames * 2) % 30);
             let ty = y - 18 + (i * 10 + frames * 1.5) % 35;
@@ -286,7 +280,7 @@ const bird = {
     reset() { this.y = 250; this.velocity = 0; }
 };
 
-// --- QUẢN LÝ ỐNG CỐNG & ĐỘ KHÓ ---
+// --- QUẢN LÝ ỐNG CỐNG & CÂY ĂN THỊT ---
 const pipes = {
     items: [], gap: 130, width: 56, speed: 2.2, pipeCounter: 0,
     
@@ -306,8 +300,8 @@ const pipes = {
 
     draw() {
         this.items.forEach(p => {
-            drawPipesByTheme(p.x, 0, this.width, p.top, true, p.isInfinite, currentDifficulty);
-            drawPipesByTheme(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false, p.isInfinite, currentDifficulty);
+            drawPipesByTheme(p.x, 0, this.width, p.top, true, p.hasPlant, currentDifficulty);
+            drawPipesByTheme(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false, p.hasPlant, currentDifficulty);
         });
     },
     update() {
@@ -317,14 +311,14 @@ const pipes = {
             let top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
             
             this.pipeCounter++;
-            let isInfinite = (this.pipeCounter % 5 === 0);
+            let hasPlant = (this.pipeCounter % 4 === 0);
 
             this.items.push({ 
                 x: canvas.width, 
                 top: top, 
                 bottom: top + this.gap, 
                 passed: false,
-                isInfinite: isInfinite 
+                hasPlant: hasPlant 
             });
         }
         this.items.forEach((p, index) => {
@@ -335,6 +329,24 @@ const pipes = {
                (bird.y - bird.radius < p.top || bird.y + bird.radius > p.bottom)) {
                 triggerGameOver();
             }
+
+            // Kiểm tra va chạm cây ăn thịt giống hệt mẫu hình ảnh
+            if (p.hasPlant) {
+                let plantHeight = 30 + Math.sin(frames * 0.1) * 20;
+                let plantX = p.x + this.width / 2;
+                
+                // Cây ở ống trên
+                let plantTopHeadY = p.top - plantHeight;
+                if (Math.abs(bird.x - plantX) < 20 && Math.abs(bird.y - plantTopHeadY) < 22) {
+                    triggerGameOver();
+                }
+                // Cây ở ống dưới
+                let plantBottomHeadY = p.bottom + plantHeight;
+                if (Math.abs(bird.x - plantX) < 20 && Math.abs(bird.y - plantBottomHeadY) < 22) {
+                    triggerGameOver();
+                }
+            }
+
             if (p.x + this.width < bird.x && !p.passed) {
                 p.passed = true; score++; 
                 playSound('score');
@@ -353,6 +365,92 @@ const pipes = {
         this.pipeCounter = 0;
     }
 };
+
+// --- HÀM VẼ CÂY ĂN THỊT CHUẨN MẪU HÌNH ẢNH ---
+function drawPiranhaPlant(x, rimY, isTop) {
+    ctx.save();
+    let plantHeight = 30 + Math.sin(frames * 0.1) * 20; // Thò thụt sinh động
+    let px = x + 28; // Căn giữa theo ống cống
+    let headY = isTop ? (rimY - plantHeight) : (rimY + plantHeight);
+
+    // 1. Thân cuống xanh mướt nối với ống cống
+    ctx.fillStyle = '#28a028';
+    ctx.strokeStyle = '#185818';
+    ctx.lineWidth = 2;
+    if (isTop) {
+        ctx.fillRect(px - 4, rimY, 8, plantHeight);
+        ctx.strokeRect(px - 4, rimY, 8, plantHeight);
+    } else {
+        ctx.fillRect(px - 4, rimY, 8, -plantHeight);
+        ctx.strokeRect(px - 4, rimY, 8, -plantHeight);
+    }
+
+    // 2. Hai chiếc lá xanh hai bên thân giống hệt mẫu
+    ctx.fillStyle = '#38b038';
+    ctx.strokeStyle = '#185818';
+    ctx.lineWidth = 2;
+    let leafY = isTop ? (rimY + plantHeight * 0.5) : (rimY - plantHeight * 0.5);
+    
+    // Lá trái
+    ctx.beginPath();
+    ctx.ellipse(px - 14, leafY, 12, 6, -0.4, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    // Lá phải
+    ctx.beginPath();
+    ctx.ellipse(px + 14, leafY, 12, 6, 0.4, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    // 3. Đầu búp tròn màu đỏ rực rỡ chuẩn mẫu
+    ctx.fillStyle = '#e82828';
+    ctx.strokeStyle = '#380808';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(px, headY, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 4. Các đốm trắng lớn trên đầu búp
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(px - 10, headY - 2, 5, 0, Math.PI * 2); // Đốm trái
+    ctx.arc(px + 10, headY - 2, 5, 0, Math.PI * 2); // Đốm phải
+    ctx.arc(px, headY + 10, 5, 0, Math.PI * 2);    // Đốm dưới
+    ctx.fill();
+
+    // 5. Miệng mở hình chữ V màu trắng chứa răng nhọn sắc bén bên trong
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#380808';
+    ctx.lineWidth = 2;
+    
+    ctx.beginPath();
+    if (isTop) {
+        // Miệng quay xuống dưới đối với ống trên
+        ctx.moveTo(px - 14, headY - 12);
+        ctx.lineTo(px, headY + 2);
+        ctx.lineTo(px + 14, headY - 12);
+        ctx.closePath();
+    } else {
+        // Miệng quay lên trên đối với ống dưới
+        ctx.moveTo(px - 14, headY + 12);
+        ctx.lineTo(px, headY - 2);
+        ctx.lineTo(px + 14, headY + 12);
+        ctx.closePath();
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Răng nhọn bên trong miệng
+    ctx.fillStyle = '#e82828';
+    if (isTop) {
+        ctx.fillRect(px - 6, headY - 8, 3, 4);
+        ctx.fillRect(px + 3, headY - 8, 3, 4);
+    } else {
+        ctx.fillRect(px - 6, headY + 4, 3, 4);
+        ctx.fillRect(px + 3, headY + 4, 3, 4);
+    }
+
+    ctx.restore();
+}
 
 // --- HÀM VẼ GĂNG TAY TÍM CHO MAP TRUNG BÌNH ---
 function drawPurpleFistGlove(x, y, width, isTop) {
@@ -452,166 +550,145 @@ function drawHardPipeEyes(x, rimY, rW, isTop) {
 }
 
 // --- HỆ THỐNG VẼ CỐNG ---
-function drawPipesByTheme(x, y, width, height, isTop, isInfinite, difficulty) {
+function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
     ctx.save();
 
-    if (isInfinite) {
-        const infColorMain = '#112233';
-        const infColorGlow = '#00ffff';
-        const infColorCore = '#ffffff';
+    if (difficulty === 'EASY') {
+        const colDarkBorder = '#232b1a';
+        const colMainGreen  = '#75cb27';
+        const colLightGreen = '#b8e637';
+        const colWhiteLine  = '#ffffff';
+        const colDarkGreen  = '#549c1b';
 
         if (isTop) {
-            let bodyH = Math.max(0, height);
-            ctx.fillStyle = infColorMain; ctx.fillRect(x, 0, width, bodyH);
-            ctx.strokeStyle = infColorGlow; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
+            let bodyH = Math.max(0, height - 28);
+            ctx.fillStyle = colMainGreen; ctx.fillRect(x, 0, width, bodyH);
+            ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, 0, 10, bodyH);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
+            ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
-            ctx.fillStyle = infColorCore;
-            let offset = (frames * 3) % 20;
-            for (let sy = -20 + offset; sy < bodyH; sy += 20) {
-                ctx.fillRect(x + width / 2 - 4, sy, 8, 10);
-            }
+            let rimY = bodyH;
+            let rX = x - 3, rW = width + 6;
+            ctx.fillStyle = colMainGreen; ctx.fillRect(rX, rimY, rW, 28);
+            ctx.fillStyle = colLightGreen; ctx.fillRect(rX + 5, rimY, 12, 28);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+            ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
+
+            if (hasPlant) drawPiranhaPlant(x, rimY, true);
         } else {
-            let bodyY = y;
-            let bodyH = Math.max(0, canvas.height - 80 - bodyY);
-            ctx.fillStyle = infColorMain; ctx.fillRect(x, bodyY, width, bodyH);
-            ctx.strokeStyle = infColorGlow; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
+            let rimY = y;
+            let bodyY = y + 28;
+            let bodyH = Math.max(0, canvas.height - bodyY);
+            let rX = x - 3, rW = width + 6;
+            ctx.fillStyle = colMainGreen; ctx.fillRect(x, bodyY, width, bodyH);
+            ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, bodyY, 10, bodyH);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
+            ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-            ctx.fillStyle = infColorCore;
-            let offset = (frames * 3) % 20;
-            for (let sy = bodyY - 20 + offset; sy < canvas.height - 80; sy += 20) {
-                ctx.fillRect(x + width / 2 - 4, sy, 8, 10);
-            }
+            ctx.fillStyle = colMainGreen; ctx.fillRect(rX, rimY, rW, 28);
+            ctx.fillStyle = colLightGreen; ctx.fillRect(rX + 5, rimY, 12, 28);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+            ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
+
+            if (hasPlant) drawPiranhaPlant(x, rimY, false);
         }
-    } else {
-        if (difficulty === 'EASY') {
-            const colDarkBorder = '#232b1a';
-            const colMainGreen  = '#75cb27';
-            const colLightGreen = '#b8e637';
-            const colWhiteLine  = '#ffffff';
-            const colDarkGreen  = '#549c1b';
+    }
+    else if (difficulty === 'NORMAL') {
+        const colDarkBorder = '#281038';
+        const colMainPurple = '#9a50c8';
+        const colLightPurple= '#c088f0';
+        const colWhiteLine  = '#ffffff';
+        const colDarkPurple = '#682898';
 
-            if (isTop) {
-                let bodyH = Math.max(0, height - 28);
-                ctx.fillStyle = colMainGreen; ctx.fillRect(x, 0, width, bodyH);
-                ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, 0, 10, bodyH);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
-                ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, 0, 12, bodyH);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
+        if (isTop) {
+            let bodyH = Math.max(0, height - 44);
+            ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
+            ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, 0, 10, bodyH);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
+            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
-                let rimY = bodyH;
-                let rX = x - 3, rW = width + 6;
-                ctx.fillStyle = colMainGreen; ctx.fillRect(rX, rimY, rW, 28);
-                ctx.fillStyle = colLightGreen; ctx.fillRect(rX + 5, rimY, 12, 28);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
-                ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
-            } else {
-                let rimY = y;
-                let bodyY = y + 28;
-                let bodyH = Math.max(0, canvas.height - bodyY);
-                let rX = x - 3, rW = width + 6;
-                ctx.fillStyle = colMainGreen; ctx.fillRect(x, bodyY, width, bodyH);
-                ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, bodyY, 10, bodyH);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
-                ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
+            drawPurpleFistGlove(x, bodyH + 44, width, true);
+            if (hasPlant) drawPiranhaPlant(x, bodyH + 44, true);
+        } else {
+            let bodyY = y + 44;
+            let bodyH = Math.max(0, canvas.height - bodyY);
+            ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
+            ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, bodyY, 10, bodyH);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
+            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-                ctx.fillStyle = colMainGreen; ctx.fillRect(rX, rimY, rW, 28);
-                ctx.fillStyle = colLightGreen; ctx.fillRect(rX + 5, rimY, 12, 28);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
-                ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
-            }
+            drawPurpleFistGlove(x, y, width, false);
+            if (hasPlant) drawPiranhaPlant(x, y, false);
         }
-        else if (difficulty === 'NORMAL') {
-            const colDarkBorder = '#281038';
-            const colMainPurple = '#9a50c8';
-            const colLightPurple= '#c088f0';
-            const colWhiteLine  = '#ffffff';
-            const colDarkPurple = '#682898';
+    }
+    else if (difficulty === 'HARD') {
+        const colDarkBorder = '#3a0808';
+        const colMainRed    = '#d83838';
+        const colLightRed   = '#f87878';
+        const colWhiteLine  = '#ffffff';
+        const colDarkRed    = '#981818';
 
-            if (isTop) {
-                let bodyH = Math.max(0, height - 44);
-                ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
-                ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, 0, 10, bodyH);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
-                ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
+        if (isTop) {
+            let bodyH = Math.max(0, height - 28);
+            ctx.fillStyle = colMainRed; ctx.fillRect(x, 0, width, bodyH);
+            ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, 0, 10, bodyH);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
+            ctx.fillStyle = colDarkRed; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
-                drawPurpleFistGlove(x, bodyH + 44, width, true);
-            } else {
-                let bodyY = y + 44;
-                let bodyH = Math.max(0, canvas.height - bodyY);
-                ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
-                ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, bodyY, 10, bodyH);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
-                ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
+            let rimY = bodyH;
+            let rX = x - 3, rW = width + 6;
+            ctx.fillStyle = colMainRed; ctx.fillRect(rX, rimY, rW, 28);
+            ctx.fillStyle = colLightRed; ctx.fillRect(rX + 5, rimY, 12, 28);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+            ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                drawPurpleFistGlove(x, y, width, false);
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < width; i += 8) {
+                ctx.beginPath();
+                ctx.moveTo(x + i, rimY + 28);
+                ctx.lineTo(x + i + 4, rimY + 34);
+                ctx.lineTo(x + i + 8, rimY + 28);
+                ctx.fill();
             }
-        }
-        else if (difficulty === 'HARD') {
-            const colDarkBorder = '#3a0808';
-            const colMainRed    = '#d83838';
-            const colLightRed   = '#f87878';
-            const colWhiteLine  = '#ffffff';
-            const colDarkRed    = '#981818';
 
-            if (isTop) {
-                let bodyH = Math.max(0, height - 28);
-                ctx.fillStyle = colMainRed; ctx.fillRect(x, 0, width, bodyH);
-                ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, 0, 10, bodyH);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
-                ctx.fillStyle = colDarkRed; ctx.fillRect(x + width - 12, 0, 12, bodyH);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
+            drawHardPipeEyes(rX, rimY, rW, true);
+            if (hasPlant) drawPiranhaPlant(x, rimY, true);
+        } else {
+            let rimY = y;
+            let bodyY = y + 28;
+            let bodyH = Math.max(0, canvas.height - bodyY);
+            let rX = x - 3, rW = width + 6;
+            ctx.fillStyle = colMainRed; ctx.fillRect(x, bodyY, width, bodyH);
+            ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, bodyY, 10, bodyH);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
+            ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-                let rimY = bodyH;
-                let rX = x - 3, rW = width + 6;
-                ctx.fillStyle = colMainRed; ctx.fillRect(rX, rimY, rW, 28);
-                ctx.fillStyle = colLightRed; ctx.fillRect(rX + 5, rimY, 12, 28);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
-                ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
+            ctx.fillStyle = colMainRed; ctx.fillRect(rX, rimY, rW, 28);
+            ctx.fillStyle = colLightRed; ctx.fillRect(rX + 5, rimY, 12, 28);
+            ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+            ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+            ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                ctx.fillStyle = '#ffffff';
-                for (let i = 0; i < width; i += 8) {
-                    ctx.beginPath();
-                    ctx.moveTo(x + i, rimY + 28);
-                    ctx.lineTo(x + i + 4, rimY + 34);
-                    ctx.lineTo(x + i + 8, rimY + 28);
-                    ctx.fill();
-                }
-
-                drawHardPipeEyes(rX, rimY, rW, true);
-            } else {
-                let rimY = y;
-                let bodyY = y + 28;
-                let bodyH = Math.max(0, canvas.height - bodyY);
-                let rX = x - 3, rW = width + 6;
-                ctx.fillStyle = colMainRed; ctx.fillRect(x, bodyY, width, bodyH);
-                ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, bodyY, 10, bodyH);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
-                ctx.fillStyle = colDarkRed; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
-
-                ctx.fillStyle = colMainRed; ctx.fillRect(rX, rimY, rW, 28);
-                ctx.fillStyle = colLightRed; ctx.fillRect(rX + 5, rimY, 12, 28);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
-                ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
-
-                ctx.fillStyle = '#ffffff';
-                for (let i = 0; i < width; i += 8) {
-                    ctx.beginPath();
-                    ctx.moveTo(x + i, rimY);
-                    ctx.lineTo(x + i + 4, rimY - 6);
-                    ctx.lineTo(x + i + 8, rimY);
-                    ctx.fill();
-                }
-
-                drawHardPipeEyes(rX, rimY, rW, false);
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < width; i += 8) {
+                ctx.beginPath();
+                ctx.moveTo(x + i, rimY);
+                ctx.lineTo(x + i + 4, rimY - 6);
+                ctx.lineTo(x + i + 8, rimY);
+                ctx.fill();
             }
+
+            drawHardPipeEyes(rX, rimY, rW, false);
+            if (hasPlant) drawPiranhaPlant(x, rimY, false);
         }
     }
     ctx.restore();
