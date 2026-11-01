@@ -109,7 +109,7 @@ let frames = 0;
 let selectedSkin = 1;
 let currentDifficulty = 'EASY';
 
-// Biến điều khiển sự kiện Boss Fight & Cảnh Cinematic Cột 20
+// Biến điều khiển sự kiện Boss & Cinematic cột 20
 let isBossFight = false;
 let bossFlashTimer = 0;
 let isCinematicEnding = false;
@@ -570,7 +570,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
 // --- VẼ BOSS HIỆP SĨ SẮC NÉT GIỐNG HỆT ẢNH MẪU ---
 function drawDetailedKnightBoss() {
     ctx.save();
-    // Nền tối u ám bọc quanh boss
     ctx.fillStyle = '#161022'; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let bx = canvas.width / 2;
@@ -589,9 +588,8 @@ function drawDetailedKnightBoss() {
 
     // 2. GIÁP VAI ĐỒ SỘ (PAULDRONS)
     const armorBase = '#8a7e6b';
-    const armorHigh = '#d4c5a9';
-    const armorDark = '#4a4235';
     const goldTrim  = '#d4af37';
+    const armorDark = '#4a4235';
 
     // Vai trái
     ctx.fillStyle = armorBase;
@@ -610,7 +608,6 @@ function drawDetailedKnightBoss() {
     ctx.beginPath(); ctx.roundRect(-100, -95, 200, 180, 16); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
 
-    // Hoa văn chữ V / Viền vàng trên giáp ngực
     ctx.fillStyle = armorDark;
     ctx.beginPath();
     ctx.moveTo(-70, -70); ctx.lineTo(0, -20); ctx.lineTo(70, -70);
@@ -622,22 +619,21 @@ function drawDetailedKnightBoss() {
     ctx.fillStyle = '#7a5a38';
     ctx.beginPath(); ctx.roundRect(115, -60, 50, 140, 24); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
-    // Biểu tượng mặt trời/hoa văn trên khiên
     ctx.fillStyle = goldTrim;
     ctx.beginPath(); ctx.arc(140, 10, 16, 0, Math.PI * 2); ctx.fill();
 
     // 5. THANH KIẾM KHỔNG LỒ NGANG TRƯỚC NGỰC BOSS
-    ctx.fillStyle = '#a08850'; // Chuôi kiếm
+    ctx.fillStyle = '#a08850';
     ctx.fillRect(-140, -15, 45, 14);
-    ctx.fillStyle = goldTrim; // Hốc đá quý trên chuôi
+    ctx.fillStyle = goldTrim;
     ctx.beginPath(); ctx.arc(-115, -8, 6, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#ff2200';
     ctx.beginPath(); ctx.arc(-115, -8, 3, 0, Math.PI * 2); ctx.fill();
     
-    ctx.fillStyle = '#4a3820'; // Chắn kiếm (Guard)
+    ctx.fillStyle = '#4a3820';
     ctx.fillRect(-95, -24, 18, 32);
 
-    ctx.fillStyle = '#e0e8f0'; // Lưỡi kiếm sáng lấp lánh vắt ngang
+    ctx.fillStyle = '#e0e8f0';
     ctx.beginPath();
     ctx.moveTo(-77, -12); ctx.lineTo(130, -12); ctx.lineTo(130, -6); ctx.lineTo(-77, -6);
     ctx.fill();
@@ -648,12 +644,10 @@ function drawDetailedKnightBoss() {
     ctx.beginPath(); ctx.roundRect(-65, -165, 130, 110, 44); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
 
-    // Viền trung tâm mũ giáp
     ctx.fillStyle = armorDark;
     ctx.fillRect(-12, -165, 24, 110);
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 2; ctx.strokeRect(-12, -165, 24, 110);
 
-    // Khe mắt phát sáng hung dữ
     ctx.fillStyle = '#ff1100';
     ctx.fillRect(-35, -125, 22, 10);
     ctx.fillRect(13, -125, 22, 10);
@@ -661,7 +655,6 @@ function drawDetailedKnightBoss() {
     ctx.fillRect(-28, -122, 10, 4);
     ctx.fillRect(20, -122, 10, 4);
 
-    // Miệng khe thông gió mặt nạ (Grille)
     ctx.fillStyle = '#222830';
     ctx.fillRect(-22, -95, 44, 32);
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 2; ctx.strokeRect(-22, -95, 44, 32);
@@ -672,7 +665,6 @@ function drawDetailedKnightBoss() {
 
     ctx.restore();
 
-    // Thanh kiếm cắm ở cột đích khi ở cảnh Cinematic kết liễu
     if (isCinematicEnding) {
         ctx.save();
         ctx.fillStyle = '#d4af37';
@@ -1197,7 +1189,7 @@ function handleInteraction(clientX, clientY) {
     }
 }
 
-functionstartGame() {
+function startGame() {
     bird.reset(); 
     pipes.reset(); 
     score = 0; 
