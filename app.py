@@ -330,19 +330,19 @@ const pipes = {
                 triggerGameOver();
             }
 
-            // Kiểm tra va chạm cây ăn thịt giống hệt mẫu hình ảnh
+            // Kiểm tra va chạm cây ăn thịt sắc nét
             if (p.hasPlant) {
-                let plantHeight = 30 + Math.sin(frames * 0.1) * 20;
+                let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
                 let plantX = p.x + this.width / 2;
                 
                 // Cây ở ống trên
                 let plantTopHeadY = p.top - plantHeight;
-                if (Math.abs(bird.x - plantX) < 20 && Math.abs(bird.y - plantTopHeadY) < 22) {
+                if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantTopHeadY) < 22) {
                     triggerGameOver();
                 }
                 // Cây ở ống dưới
                 let plantBottomHeadY = p.bottom + plantHeight;
-                if (Math.abs(bird.x - plantX) < 20 && Math.abs(bird.y - plantBottomHeadY) < 22) {
+                if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantBottomHeadY) < 22) {
                     triggerGameOver();
                 }
             }
@@ -366,87 +366,90 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ CÂY ĂN THỊT CHUẨN MẪU HÌNH ẢNH ---
+// --- HÀM VẼ CÂY ĂN THỊT SIÊU SẮC NÉT (CHUẨN MẪU VECTOR) ---
 function drawPiranhaPlant(x, rimY, isTop) {
     ctx.save();
-    let plantHeight = 30 + Math.sin(frames * 0.1) * 20; // Thò thụt sinh động
-    let px = x + 28; // Căn giữa theo ống cống
+    let plantHeight = 35 + Math.sin(frames * 0.1) * 22; // Độ thò thụt sinh động
+    let px = x + 28; // Căn chính giữa ống cống
     let headY = isTop ? (rimY - plantHeight) : (rimY + plantHeight);
 
-    // 1. Thân cuống xanh mướt nối với ống cống
-    ctx.fillStyle = '#28a028';
-    ctx.strokeStyle = '#185818';
-    ctx.lineWidth = 2;
+    // 1. Thân cuống xanh đậm viền sắc nét
+    ctx.fillStyle = '#229822';
+    ctx.strokeStyle = '#0e420e';
+    ctx.lineWidth = 2.5;
     if (isTop) {
-        ctx.fillRect(px - 4, rimY, 8, plantHeight);
-        ctx.strokeRect(px - 4, rimY, 8, plantHeight);
+        ctx.fillRect(px - 5, rimY, 10, plantHeight);
+        ctx.strokeRect(px - 5, rimY, 10, plantHeight);
     } else {
-        ctx.fillRect(px - 4, rimY, 8, -plantHeight);
-        ctx.strokeRect(px - 4, rimY, 8, -plantHeight);
+        ctx.fillRect(px - 5, rimY, 10, -plantHeight);
+        ctx.strokeRect(px - 5, rimY, 10, -plantHeight);
     }
 
-    // 2. Hai chiếc lá xanh hai bên thân giống hệt mẫu
-    ctx.fillStyle = '#38b038';
-    ctx.strokeStyle = '#185818';
-    ctx.lineWidth = 2;
+    // 2. Hai chiếc lá xanh mướt có gân lá rõ ràng hai bên thân
+    ctx.fillStyle = '#32b832';
+    ctx.strokeStyle = '#0e420e';
+    ctx.lineWidth = 2.5;
     let leafY = isTop ? (rimY + plantHeight * 0.5) : (rimY - plantHeight * 0.5);
     
     // Lá trái
     ctx.beginPath();
-    ctx.ellipse(px - 14, leafY, 12, 6, -0.4, 0, Math.PI * 2);
+    ctx.ellipse(px - 16, leafY, 14, 7, -0.4, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
+    
     // Lá phải
     ctx.beginPath();
-    ctx.ellipse(px + 14, leafY, 12, 6, 0.4, 0, Math.PI * 2);
+    ctx.ellipse(px + 16, leafY, 14, 7, 0.4, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
 
-    // 3. Đầu búp tròn màu đỏ rực rỡ chuẩn mẫu
-    ctx.fillStyle = '#e82828';
-    ctx.strokeStyle = '#380808';
-    ctx.lineWidth = 3;
+    // 3. Đầu búp tròn màu đỏ tươi có viền đen đậm sắc sảo
+    ctx.fillStyle = '#e82020';
+    ctx.strokeStyle = '#220000';
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
-    ctx.arc(px, headY, 18, 0, Math.PI * 2);
+    ctx.arc(px, headY, 20, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // 4. Các đốm trắng lớn trên đầu búp
+    // 4. Các đốm trắng lớn (White Spots) viền rõ nét trên đầu búp
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(px - 10, headY - 2, 5, 0, Math.PI * 2); // Đốm trái
-    ctx.arc(px + 10, headY - 2, 5, 0, Math.PI * 2); // Đốm phải
-    ctx.arc(px, headY + 10, 5, 0, Math.PI * 2);    // Đốm dưới
-    ctx.fill();
-
-    // 5. Miệng mở hình chữ V màu trắng chứa răng nhọn sắc bén bên trong
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#380808';
+    ctx.strokeStyle = '#220000';
     ctx.lineWidth = 2;
+    
+    // Đốm trái
+    ctx.beginPath(); ctx.arc(px - 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Đốm phải
+    ctx.beginPath(); ctx.arc(px + 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // Đốm dưới
+    ctx.beginPath(); ctx.arc(px, headY + 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // 5. Miệng mở hình chữ V trắng rực rỡ với viền sắc nét
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#220000';
+    ctx.lineWidth = 3;
     
     ctx.beginPath();
     if (isTop) {
-        // Miệng quay xuống dưới đối với ống trên
-        ctx.moveTo(px - 14, headY - 12);
-        ctx.lineTo(px, headY + 2);
-        ctx.lineTo(px + 14, headY - 12);
+        ctx.moveTo(px - 15, headY - 14);
+        ctx.lineTo(px, headY + 3);
+        ctx.lineTo(px + 15, headY - 14);
         ctx.closePath();
     } else {
-        // Miệng quay lên trên đối với ống dưới
-        ctx.moveTo(px - 14, headY + 12);
-        ctx.lineTo(px, headY - 2);
-        ctx.lineTo(px + 14, headY + 12);
+        ctx.moveTo(px - 15, headY + 14);
+        ctx.lineTo(px, headY - 3);
+        ctx.lineTo(px + 15, headY + 14);
         ctx.closePath();
     }
     ctx.fill();
     ctx.stroke();
 
-    // Răng nhọn bên trong miệng
-    ctx.fillStyle = '#e82828';
+    // 6. Răng nhọn sắc bén bên trong miệng
+    ctx.fillStyle = '#e82020';
     if (isTop) {
-        ctx.fillRect(px - 6, headY - 8, 3, 4);
-        ctx.fillRect(px + 3, headY - 8, 3, 4);
+        ctx.fillRect(px - 6, headY - 9, 3, 5);
+        ctx.fillRect(px + 3, headY - 9, 3, 5);
     } else {
-        ctx.fillRect(px - 6, headY + 4, 3, 4);
-        ctx.fillRect(px + 3, headY + 4, 3, 4);
+        ctx.fillRect(px - 6, headY + 4, 3, 5);
+        ctx.fillRect(px + 3, headY + 4, 3, 5);
     }
 
     ctx.restore();
