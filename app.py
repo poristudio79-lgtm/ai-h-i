@@ -80,6 +80,7 @@ function playSound(type) {
 let gameState = 'START'; // START, CHARACTERS, PLAYING, GAMEOVER
 let score = 0;
 let highScore = localStorage.getItem('fb_highscore') || 0;
+let isNewHighScore = false;
 let frames = 0;
 let selectedSkin = 1;
 
@@ -95,6 +96,10 @@ const CHARACTERS = [
 const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
 const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
 
+// Nút ở màn hình Game Over
+const gameOverPlayBtn = { x: 95, y: 440, w: 130, h: 60 };
+const gameOverMenuBtn = { x: 255, y: 440, w: 130, h: 60 };
+
 // --- HÀM VẼ NHÂN VẬT PIXEL SIÊU RÕ NÉT ---
 function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
     ctx.save();
@@ -102,7 +107,7 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
     ctx.rotate(rotation);
     const p = scale;
 
-    if (skinId === 0) { // GBI
+    if (skinId === 0) {
         ctx.fillStyle = '#2b221e'; ctx.fillRect(-8*p, -7*p, 16*p, 13*p);
         ctx.fillStyle = '#f8ea38'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#e82878'; ctx.fillRect(-7*p, -7*p, 14*p, 3*p);
@@ -112,7 +117,7 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
         ctx.fillStyle = '#e82878'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, 0*p, 4*p, 3*p);
     } 
-    else if (skinId === 1) { // OHINH (Vàng gốc)
+    else if (skinId === 1) {
         ctx.fillStyle = '#2b221e'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#f8d038'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f8b000'; ctx.fillRect(-6*p, 2*p, 10*p, 2*p);
@@ -121,7 +126,7 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
         ctx.fillStyle = '#f85820'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     } 
-    else if (skinId === 2) { // HOI BINK
+    else if (skinId === 2) {
         ctx.fillStyle = '#1e2b1e'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#509848'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#78c038'; ctx.fillRect(-5*p, -10*p, 10*p, 4*p); ctx.fillRect(-7*p, -7*p, 14*p, 2*p);
@@ -130,7 +135,7 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
         ctx.fillStyle = '#f87820'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 3) { // KHON
+    else if (skinId === 3) {
         ctx.fillStyle = '#261933'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#8838d0'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f858a8'; ctx.fillRect(-6*p, -10*p, 11*p, 4*p);
@@ -140,7 +145,7 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
         ctx.fillStyle = '#f89020'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#f878c0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 4) { // BINH
+    else if (skinId === 4) {
         ctx.fillStyle = '#16282b'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#38a8b8'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#c048d0'; ctx.fillRect(3*p, -11*p, 3*p, 5*p);
@@ -150,7 +155,7 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
         ctx.fillStyle = '#306870'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#78e0f0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 5) { // NARWHAL
+    else if (skinId === 5) {
         ctx.fillStyle = '#0a1e24'; ctx.fillRect(-10*p, -4*p, 20*p, 10*p);
         ctx.fillStyle = '#20b2aa'; ctx.fillRect(-9*p, -3*p, 18*p, 8*p);
         ctx.fillStyle = '#e0f8f8'; ctx.fillRect(-9*p, 1*p, 18*p, 4*p);
@@ -224,7 +229,11 @@ const pipes = {
             }
             if (p.x + this.width < bird.x && !p.passed) {
                 p.passed = true; score++; playSound('score');
-                if (score > highScore) { highScore = score; localStorage.setItem('fb_highscore', highScore); }
+                if (score > highScore) { 
+                    highScore = score; 
+                    isNewHighScore = true;
+                    localStorage.setItem('fb_highscore', highScore); 
+                }
             }
             if (p.x + this.width < 0) this.items.splice(index, 1);
         });
@@ -385,7 +394,6 @@ function drawCharacterMenu() {
             ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(bx, by, boxW, boxH);
         }
 
-        // Vẽ nhân vật trong menu to rõ nét hơn
         drawPixelBird(bx + boxW / 2, by + 38, i, 2.2);
 
         ctx.fillStyle = isSelected ? '#d49b00' : '#457a82';
@@ -410,6 +418,119 @@ function drawCharacterMenu() {
     ctx.fillText('BẮT ĐẦU CHƠI', canvas.width / 2, 558);
 }
 
+// --- VẼ MÀN HÌNH GAME OVER CHUẨN PIXEL ---
+function drawGameOverScreen() {
+    // 1. Chữ GAME OVER nổi 3D
+    ctx.save();
+    ctx.font = '900 46px "Courier New", sans-serif';
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#2b1a0a';
+    ctx.fillText('GAME OVER', canvas.width / 2 + 3, 143);
+    ctx.fillStyle = '#f85820';
+    ctx.fillText('GAME OVER', canvas.width / 2, 140);
+    ctx.restore();
+
+    // 2. Bảng Báo Điểm 3D (Scoreboard)
+    let pbX = 60, pbY = 180, pbW = 360, pbH = 220;
+
+    // Viền đen và Nền vàng nhạt
+    ctx.fillStyle = '#ded895';
+    ctx.fillRect(pbX, pbY, pbW, pbH);
+    ctx.strokeStyle = '#3a2810';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(pbX, pbY, pbW, pbH);
+
+    ctx.strokeStyle = '#f8f0c0';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(pbX + 4, pbY + 4, pbW - 8, pbH - 8);
+
+    // VẼ HUY CHƯƠNG (MEDAL)
+    ctx.fillStyle = '#3a2810';
+    ctx.font = 'bold 16px "Courier New"';
+    ctx.textAlign = 'left';
+    ctx.fillText('MEDAL', pbX + 35, pbY + 50);
+
+    let medalX = pbX + 60;
+    let medalY = pbY + 115;
+    
+    // Vẽ khung tròn huy chương
+    ctx.beginPath();
+    ctx.arc(medalX, medalY, 32, 0, Math.PI * 2);
+    ctx.fillStyle = '#3a2810';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(medalX, medalY, 28, 0, Math.PI * 2);
+
+    if (score >= 30) {
+        ctx.fillStyle = '#40e0d0'; // Bạch kim/Kim cương
+    } else if (score >= 20) {
+        ctx.fillStyle = '#f8d038'; // Vàng
+    } else if (score >= 10) {
+        ctx.fillStyle = '#d0d0d0'; // Bạc
+    } else if (score >= 5) {
+        ctx.fillStyle = '#cc7722'; // Đồng
+    } else {
+        ctx.fillStyle = '#8a795d'; // Không đạt
+    }
+    ctx.fill();
+
+    // Lồng ngôi sao nhỏ giữa huy chương
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(medalX, medalY, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    // HIỂN THỊ ĐIỂM SỐ (SCORE & BEST)
+    ctx.textAlign = 'right';
+
+    // Nhãn SCORE
+    ctx.fillStyle = '#f85820';
+    ctx.font = 'bold 16px "Courier New"';
+    ctx.fillText('SCORE', pbX + pbW - 35, pbY + 45);
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '900 32px "Courier New"';
+    ctx.fillText(score, pbX + pbW - 35, pbY + 85);
+
+    // Nhãn BEST
+    ctx.fillStyle = '#f85820';
+    ctx.font = 'bold 16px "Courier New"';
+    ctx.fillText('BEST', pbX + pbW - 35, pbY + 130);
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '900 32px "Courier New"';
+    ctx.fillText(highScore, pbX + pbW - 35, pbY + 170);
+
+    // Ký hiệu "NEW" nhấp nháy nếu phá kỷ lục
+    if (isNewHighScore && Math.floor(frames / 15) % 2 === 0) {
+        ctx.fillStyle = '#e82828';
+        ctx.font = '900 14px "Courier New"';
+        ctx.fillText('NEW!', pbX + pbW - 130, pbY + 165);
+    }
+
+    // 3. NÚT CHƠI LẠI (OK / PLAY) & MENU
+    // Nút Play lại
+    ctx.fillStyle = '#54cb37';
+    ctx.fillRect(gameOverPlayBtn.x, gameOverPlayBtn.y, gameOverPlayBtn.w, gameOverPlayBtn.h);
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+    ctx.strokeRect(gameOverPlayBtn.x, gameOverPlayBtn.y, gameOverPlayBtn.w, gameOverPlayBtn.h);
+    
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 20px "Courier New"'; ctx.textAlign = 'center';
+    ctx.fillText('CHƠI LAỊ', gameOverPlayBtn.x + gameOverPlayBtn.w / 2, gameOverPlayBtn.y + 36);
+
+    // Nút Về Menu
+    ctx.fillStyle = '#f88020';
+    ctx.fillRect(gameOverMenuBtn.x, gameOverMenuBtn.y, gameOverMenuBtn.w, gameOverMenuBtn.h);
+    ctx.strokeRect(gameOverMenuBtn.x, gameOverMenuBtn.y, gameOverMenuBtn.w, gameOverMenuBtn.h);
+
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 20px "Courier New"';
+    ctx.fillText('MENU', gameOverMenuBtn.x + gameOverMenuBtn.w / 2, gameOverMenuBtn.y + 36);
+}
+
 function drawUI() {
     if (gameState === 'START') {
         drawMainMenu();
@@ -421,27 +542,15 @@ function drawUI() {
         ctx.strokeText(score, canvas.width / 2, 60);
         ctx.fillText(score, canvas.width / 2, 60);
     } else if (gameState === 'GAMEOVER') {
-        ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
-        ctx.font = '30px Courier New'; ctx.textAlign = 'center';
-        ctx.strokeText('GAME OVER', canvas.width / 2, 180);
-        ctx.fillText('GAME OVER', canvas.width / 2, 180);
-
-        drawPixelBird(canvas.width / 2, 230, selectedSkin, 2.6, 0.5);
-
-        ctx.font = '18px Courier New';
-        ctx.strokeText(`Điểm: ${score}`, canvas.width / 2, 290);
-        ctx.fillText(`Điểm: ${score}`, canvas.width / 2, 290);
-        ctx.strokeText(`Cao nhất: ${highScore}`, canvas.width / 2, 320);
-        ctx.fillText(`Cao nhất: ${highScore}`, canvas.width / 2, 320);
-
-        ctx.font = '14px Courier New';
-        ctx.strokeText('Bấm SPACE hoặc CHẠM để chơi lại', canvas.width / 2, 380);
-        ctx.fillText('Bấm SPACE hoặc CHẠM để chơi lại', canvas.width / 2, 380);
+        drawGameOverScreen();
     }
 }
 
 function triggerGameOver() {
-    if (gameState !== 'GAMEOVER') { playSound('hit'); gameState = 'GAMEOVER'; }
+    if (gameState !== 'GAMEOVER') { 
+        playSound('hit'); 
+        gameState = 'GAMEOVER'; 
+    }
 }
 
 function loop() {
@@ -465,6 +574,7 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
+// --- TƯƠNG TÁC ĐIỀU KHIỂN ---
 function handleInteraction(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
@@ -473,7 +583,7 @@ function handleInteraction(clientX, clientY) {
     if (gameState === 'START') {
         if (clickX >= menuPlayBtn.x && clickX <= menuPlayBtn.x + menuPlayBtn.w &&
             clickY >= menuPlayBtn.y && clickY <= menuPlayBtn.y + menuPlayBtn.h) {
-            bird.reset(); pipes.reset(); score = 0; frames = 0;
+            bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
             gameState = 'PLAYING'; bird.jump();
             return;
         }
@@ -498,7 +608,7 @@ function handleInteraction(clientX, clientY) {
         });
 
         if (clickX >= 140 && clickX <= 340 && clickY >= 530 && clickY <= 575) {
-            bird.reset(); pipes.reset(); score = 0; frames = 0;
+            bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
             gameState = 'PLAYING'; bird.jump();
         }
     } 
@@ -506,19 +616,31 @@ function handleInteraction(clientX, clientY) {
         bird.jump();
     } 
     else if (gameState === 'GAMEOVER') {
-        bird.reset(); pipes.reset(); score = 0; frames = 0;
-        gameState = 'PLAYING';
+        // Nút Chơi Lại
+        if (clickX >= gameOverPlayBtn.x && clickX <= gameOverPlayBtn.x + gameOverPlayBtn.w &&
+            clickY >= gameOverPlayBtn.y && clickY <= gameOverPlayBtn.y + gameOverPlayBtn.h) {
+            bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
+            gameState = 'PLAYING'; bird.jump();
+            return;
+        }
+        // Nút Về Menu
+        if (clickX >= gameOverMenuBtn.x && clickX <= gameOverMenuBtn.x + gameOverMenuBtn.w &&
+            clickY >= gameOverMenuBtn.y && clickY <= gameOverMenuBtn.y + gameOverMenuBtn.h) {
+            bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
+            gameState = 'START';
+            return;
+        }
     }
 }
 
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
-        if (gameState === 'START') {
-            bird.reset(); pipes.reset(); score = 0; frames = 0;
+        if (gameState === 'START' || gameState === 'CHARACTERS') {
+            bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
             gameState = 'PLAYING'; bird.jump();
-        } else if (gameState === 'CHARACTERS') {
-            bird.reset(); pipes.reset(); score = 0; frames = 0;
+        } else if (gameState === 'GAMEOVER') {
+            bird.reset(); pipes.reset(); score = 0; frames = 0; isNewHighScore = false;
             gameState = 'PLAYING'; bird.jump();
         } else {
             handleInteraction(-100, -100);
