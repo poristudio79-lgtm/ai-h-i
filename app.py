@@ -99,7 +99,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
     ctx.translate(x, y);
     const p = scale;
 
-    if (skinId === 0) { // 1. GBI (Băng đô hồng & mỏ hồng)
+    if (skinId === 0) { // 1. GBI
         ctx.fillStyle = '#4a403a'; ctx.fillRect(-8*p, -7*p, 16*p, 13*p);
         ctx.fillStyle = '#f8ea38'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#e82878'; ctx.fillRect(-7*p, -7*p, 14*p, 3*p);
@@ -109,7 +109,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#e82878'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, 0*p, 4*p, 3*p);
     } 
-    else if (skinId === 1) { // 2. OHINH (Chim vàng gốc)
+    else if (skinId === 1) { // 2. OHINH (Vàng gốc)
         ctx.fillStyle = '#4a403a'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#f8d038'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f8b000'; ctx.fillRect(-6*p, 2*p, 10*p, 2*p);
@@ -118,7 +118,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#f85820'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     } 
-    else if (skinId === 2) { // 3. HOI BINK (Chim nón xanh)
+    else if (skinId === 2) { // 3. HOI BINK
         ctx.fillStyle = '#303030'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#509848'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#78c038'; ctx.fillRect(-5*p, -10*p, 10*p, 4*p); ctx.fillRect(-7*p, -7*p, 14*p, 2*p);
@@ -127,7 +127,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#f87820'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 3) { // 4. KHON (Chim tím vương miện)
+    else if (skinId === 3) { // 4. KHON
         ctx.fillStyle = '#302040'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#8838d0'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f858a8'; ctx.fillRect(-6*p, -10*p, 11*p, 4*p);
@@ -137,7 +137,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#f89020'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#f878c0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 4) { // 5. BINH (Đầu chim unicorn lam)
+    else if (skinId === 4) { // 5. BINH
         ctx.fillStyle = '#203840'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#38a8b8'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#c048d0'; ctx.fillRect(3*p, -11*p, 3*p, 5*p);
@@ -147,13 +147,11 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#306870'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#78e0f0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 5) { // 6. NARWHAL (Kỳ lân biển cá voi)
+    else if (skinId === 5) { // 6. NARWHAL
         ctx.fillStyle = '#103038'; ctx.fillRect(-10*p, -4*p, 20*p, 10*p);
         ctx.fillStyle = '#20b2aa'; ctx.fillRect(-9*p, -3*p, 18*p, 8*p);
         ctx.fillStyle = '#e0f8f8'; ctx.fillRect(-9*p, 1*p, 18*p, 4*p);
-        // Sừng dài phía trước
         ctx.fillStyle = '#e0e0e0'; ctx.fillRect(7*p, -7*p, 2*p, 6*p); ctx.fillRect(8*p, -9*p, 2*p, 3*p);
-        // Đuôi cá
         ctx.fillStyle = '#20b2aa'; ctx.fillRect(-13*p, -6*p, 4*p, 6*p); ctx.fillRect(-13*p, 2*p, 4*p, 6*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(1*p, -3*p, 5*p, 5*p);
         ctx.fillStyle = '#103038'; ctx.fillRect(3*p, -2*p, 2*p, 3*p);
@@ -187,16 +185,119 @@ const bird = {
     reset() { this.y = 250; this.velocity = 0; }
 };
 
+// --- HÀM VẼ ĐƯỜNG ỐNG CỐNG RETRO PIXEL ART CHUẨN ---
+function drawSinglePipe(x, y, width, height, isTop) {
+    const rimHeight = 28;
+    const rimExtraWidth = 6;
+    const rimX = x - rimExtraWidth / 2;
+    const rimW = width + rimExtraWidth;
+
+    // Màu sắc Pixel Art Chuẩn
+    const colDarkBorder = '#232b1a'; // Viền đen sậm
+    const colMainGreen  = '#75cb27'; // Xanh lá chính
+    const colLightGreen = '#b8e637'; // Xanh nhạt bề mặt
+    const colWhiteLine  = '#ffffff'; // Vệt phản quang trắng
+    const colDarkGreen  = '#549c1b'; // Xanh đậm đổ bóng bên phải
+
+    ctx.save();
+
+    if (isTop) {
+        // --- ỐNG TRÊN ---
+        let bodyH = Math.max(0, height - rimHeight);
+
+        // 1. Thân ống
+        ctx.fillStyle = colMainGreen;
+        ctx.fillRect(x, 0, width, bodyH);
+
+        // Đổ mảng màu thân
+        ctx.fillStyle = colLightGreen;
+        ctx.fillRect(x + 4, 0, 10, bodyH);
+        ctx.fillStyle = colWhiteLine;
+        ctx.fillRect(x + 14, 0, 4, bodyH);
+        ctx.fillStyle = colDarkGreen;
+        ctx.fillRect(x + width - 12, 0, 12, bodyH);
+
+        // Viền thân ống
+        ctx.strokeStyle = colDarkBorder;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, 0, width, bodyH);
+
+        // 2. Đầu ống (Nắp ống nhô rộng)
+        let rimY = bodyH;
+        ctx.fillStyle = colMainGreen;
+        ctx.fillRect(rimX, rimY, rimW, rimHeight);
+
+        ctx.fillStyle = colLightGreen;
+        ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
+        ctx.fillStyle = colWhiteLine;
+        ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
+        ctx.fillStyle = colDarkGreen;
+        ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
+
+        // Viền đầu ống
+        ctx.strokeStyle = colDarkBorder;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+
+        // Đường bóng đổ dưới vành ống
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(x, rimY + rimHeight, width, 4);
+
+    } else {
+        // --- ỐNG DƯỚI ---
+        let rimY = y;
+        let bodyY = y + rimHeight;
+        let bodyH = Math.max(0, canvas.height - 80 - bodyY);
+
+        // 1. Thân ống
+        ctx.fillStyle = colMainGreen;
+        ctx.fillRect(x, bodyY, width, bodyH);
+
+        ctx.fillStyle = colLightGreen;
+        ctx.fillRect(x + 4, bodyY, 10, bodyH);
+        ctx.fillStyle = colWhiteLine;
+        ctx.fillRect(x + 14, bodyY, 4, bodyH);
+        ctx.fillStyle = colDarkGreen;
+        ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
+
+        // Viền thân
+        ctx.strokeStyle = colDarkBorder;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, bodyY, width, bodyH);
+
+        // 2. Đầu ống
+        ctx.fillStyle = colMainGreen;
+        ctx.fillRect(rimX, rimY, rimW, rimHeight);
+
+        ctx.fillStyle = colLightGreen;
+        ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
+        ctx.fillStyle = colWhiteLine;
+        ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
+        ctx.fillStyle = colDarkGreen;
+        ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
+
+        // Viền đầu ống
+        ctx.strokeStyle = colDarkBorder;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+
+        // Bóng đổ của nắp ống lên thân
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(x, bodyY, width, 4);
+    }
+
+    ctx.restore();
+}
+
 // --- QUẢN LÝ ỐNG CỐNG ---
 const pipes = {
     items: [], gap: 130, width: 56, speed: 2,
     draw() {
         this.items.forEach(p => {
-            ctx.fillStyle = '#73bf2e'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-            ctx.fillRect(p.x, 0, this.width, p.top);
-            ctx.strokeRect(p.x, 0, this.width, p.top);
-            ctx.fillRect(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom);
-            ctx.strokeRect(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom);
+            // Vẽ Ống Trên
+            drawSinglePipe(p.x, 0, this.width, p.top, true);
+            // Vẽ Ống Dưới
+            drawSinglePipe(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false);
         });
     },
     update() {
@@ -208,7 +309,10 @@ const pipes = {
         }
         this.items.forEach((p, index) => {
             p.x -= this.speed;
-            if (bird.x + bird.radius > p.x && bird.x - bird.radius < p.x + this.width &&
+
+            // Tính toán va chạm chính xác theo vành ống nhô rộng
+            let rimExtra = 3;
+            if (bird.x + bird.radius > p.x - rimExtra && bird.x - bird.radius < p.x + this.width + rimExtra &&
                (bird.y - bird.radius < p.top || bird.y + bird.radius > p.bottom)) {
                 triggerGameOver();
             }
@@ -222,16 +326,42 @@ const pipes = {
     reset() { this.items = []; }
 };
 
-function drawGround() {
-    ctx.fillStyle = '#ded895'; ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(0, canvas.height - 80); ctx.lineTo(canvas.width, canvas.height - 80); ctx.stroke();
-    ctx.fillStyle = '#73bf2e'; ctx.fillRect(0, canvas.height - 80, canvas.width, 14);
+// --- MẶT ĐẤT VÀ THÀNH PHỐ NỀN ---
+function drawBackgroundCity() {
+    // Vẽ núi / mây trôi xa
+    ctx.fillStyle = '#a1e4c3';
+    ctx.beginPath();
+    ctx.arc(60, 520, 70, 0, Math.PI * 2);
+    ctx.arc(180, 530, 80, 0, Math.PI * 2);
+    ctx.arc(320, 520, 90, 0, Math.PI * 2);
+    ctx.arc(440, 530, 75, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Các tòa nhà chọc trời nhạt màu ở nền đằng sau
+    ctx.fillStyle = '#83d8b4';
+    ctx.fillRect(20, 480, 40, 80);
+    ctx.fillRect(80, 450, 50, 110);
+    ctx.fillRect(150, 490, 35, 70);
+    ctx.fillRect(220, 460, 60, 100);
+    ctx.fillRect(300, 440, 45, 120);
+    ctx.fillRect(370, 470, 55, 90);
 }
 
-// --- BẢNG CHỌN NHÂN VẬT CHUẨN 100% THEO HÌNH ---
+function drawGround() {
+    drawBackgroundCity();
+
+    // Đất trồng cỏ
+    ctx.fillStyle = '#ded895'; ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
+    ctx.strokeStyle = '#232b1a'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(0, canvas.height - 80); ctx.lineTo(canvas.width, canvas.height - 80); ctx.stroke();
+    
+    // Cỏ xanh lá mạ trên mặt đất
+    ctx.fillStyle = '#75cb27'; ctx.fillRect(0, canvas.height - 80, canvas.width, 16);
+    ctx.fillStyle = '#549c1b'; ctx.fillRect(0, canvas.height - 68, canvas.width, 4);
+}
+
+// --- BẢNG CHỌN NHÂN VẬT ---
 function drawCharacterMenu() {
-    // 1. Nền popup xanh nhạt có viền đen đậm
     let panelX = 30, panelY = 40, panelW = 420, panelH = 550;
     
     ctx.fillStyle = '#bdebf2';
@@ -240,20 +370,16 @@ function drawCharacterMenu() {
     ctx.lineWidth = 6;
     ctx.strokeRect(panelX, panelY, panelW, panelH);
 
-    // Viền trong bo nhẹ
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
     ctx.strokeRect(panelX + 4, panelY + 4, panelW - 8, panelH - 8);
 
-    // 2. Tiêu đề 3D "NHÂN VẬT" với chữ Pixel nhiều màu & Sao lấp lánh
     ctx.font = '900 36px "Courier New", sans-serif';
     ctx.textAlign = 'center';
     
-    // Đổ bóng chữ
     ctx.fillStyle = '#3a2050';
     ctx.fillText('NHÂN VẬT', canvas.width / 2 + 3, panelY + 63);
 
-    // Vẽ từng ký tự màu sắc
     const titleText = 'NHÂN VẬT';
     const colors = ['#f8d038', '#f858a8', '#38a8b8', '#9848d0', '#509848', '#f87820', '#38a8b8', '#f858a8'];
     let startX = canvas.width / 2 - 95;
@@ -262,38 +388,27 @@ function drawCharacterMenu() {
         ctx.fillText(titleText[i], startX + i * 24, panelY + 60);
     }
 
-    // Vẽ các ngôi sao vàng trang trí
     drawStar(panelX + 70, panelY + 45, '#f8d038');
     drawStar(panelX + 350, panelY + 50, '#f8d038');
     drawStar(panelX + 40, panelY + 160, '#f8d038');
     drawStar(panelX + 380, panelY + 280, '#f8d038');
 
-    // 3. Vẽ 6 Ô nhân vật (3 Cột x 2 Hàng)
-    const startGridX = 55;
-    const startGridY = 130;
-    const boxW = 110;
-    const boxH = 120;
-    const gapX = 20;
-    const gapY = 25;
+    const startGridX = 55, startGridY = 130, boxW = 110, boxH = 120, gapX = 20, gapY = 25;
 
     CHARACTERS.forEach((char, i) => {
         let col = i % 3;
         let row = Math.floor(i / 3);
         let bx = startGridX + col * (boxW + gapX);
         let by = startGridY + row * (boxH + gapY);
-
         let isSelected = (selectedSkin === i);
 
-        // Nền ô nhân vật
         ctx.fillStyle = '#a6e3ed';
         ctx.fillRect(bx, by, boxW, boxH);
 
-        // Viền ô (Nếu chọn thì viền Vàng Kim 3D, không thì viền trắng)
         if (isSelected) {
             ctx.strokeStyle = '#d49b00';
             ctx.lineWidth = 6;
             ctx.strokeRect(bx - 2, by - 2, boxW + 4, boxH + 4);
-            
             ctx.strokeStyle = '#fff7b2';
             ctx.lineWidth = 3;
             ctx.strokeRect(bx, by, boxW, boxH);
@@ -303,10 +418,8 @@ function drawCharacterMenu() {
             ctx.strokeRect(bx, by, boxW, boxH);
         }
 
-        // Vẽ Sprite Nhân Vật
         drawPixelBird(bx + boxW / 2, by + 38, i, 1.8);
 
-        // Nhãn Tên Nhân Vật (Khung xám xanh)
         ctx.fillStyle = isSelected ? '#d49b00' : '#457a82';
         ctx.fillRect(bx + 10, by + 72, boxW - 20, 18);
         ctx.strokeStyle = '#000';
@@ -317,7 +430,6 @@ function drawCharacterMenu() {
         ctx.font = 'bold 10px "Courier New"';
         ctx.fillText(char.name, bx + boxW / 2, by + 85);
 
-        // Nút "CHỌN" phía dưới ô
         ctx.fillStyle = isSelected ? '#f8b000' : '#e0f8f8';
         ctx.fillRect(bx + 20, by + 94, boxW - 40, 18);
         ctx.strokeStyle = '#000';
@@ -329,18 +441,13 @@ function drawCharacterMenu() {
         ctx.fillText('CHỌN', bx + boxW / 2, by + 107);
     });
 
-    // 4. Hàng nút chức năng ở đáy Menu
     const bottomBtns = ['CHƠI NGAY', 'CỬA HÀNG', 'BXH', 'CÀI ĐẶT'];
-    const btnW = 85;
-    const btnH = 32;
-    const btnGap = 10;
-    let bStartX = 52;
-    let bY = 530;
+    const btnW = 85, btnH = 32, btnGap = 10;
+    let bStartX = 52, bY = 530;
 
     bottomBtns.forEach((btnText, idx) => {
         let bx = bStartX + idx * (btnW + btnGap);
-
-        ctx.fillStyle = (idx === 0) ? '#e0f8f8' : '#e0f8f8';
+        ctx.fillStyle = '#e0f8f8';
         ctx.fillRect(bx, bY, btnW, btnH);
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 2;
@@ -352,7 +459,6 @@ function drawCharacterMenu() {
     });
 }
 
-// Hàm vẽ ngôi sao lấp lánh
 function drawStar(cx, cy, color) {
     ctx.save();
     ctx.fillStyle = color;
@@ -408,7 +514,7 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-// --- TƯƠNG TÁC TẠI MÀN HÌNH CHỌN NHÂN VẬT ---
+// --- TƯƠNG TÁC ĐIỀU KHIỂN ---
 function handleInteraction(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
@@ -417,7 +523,6 @@ function handleInteraction(clientX, clientY) {
     if (gameState === 'START' || gameState === 'CHARACTERS') {
         const startGridX = 55, startGridY = 130, boxW = 110, boxH = 120, gapX = 20, gapY = 25;
 
-        // 1. Kiểm tra click chọn 6 Nhân vật
         CHARACTERS.forEach((char, i) => {
             let col = i % 3; let row = Math.floor(i / 3);
             let bx = startGridX + col * (boxW + gapX);
@@ -429,9 +534,8 @@ function handleInteraction(clientX, clientY) {
             }
         });
 
-        // 2. Kiểm tra click Nút "CHƠI NGAY"
-        const btnW = 85, btnH = 32, btnGap = 10, bStartX = 52, bY = 530;
-        let playBtnX = bStartX; // Nút đầu tiên
+        const btnW = 85, btnH = 32, bStartX = 52, bY = 530;
+        let playBtnX = bStartX;
         if (clickX >= playBtnX && clickX <= playBtnX + btnW && clickY >= bY && clickY <= bY + btnH) {
             bird.reset(); pipes.reset(); score = 0; frames = 0;
             gameState = 'PLAYING'; bird.jump();
