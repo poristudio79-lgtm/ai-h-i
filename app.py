@@ -251,7 +251,7 @@ const pipes = {
                 isBossFight = true;
                 bossFlashTimer = 60; // Hiệu ứng chớp nháy tối sầm
                 playSound('boss_alert');
-                this.speed += 0.5; // Tăng tốc độ khi đánh boss
+                this.speed += 0.5;
             }
 
             // CỘT 20 LÀ VẠCH ĐÍCH CHIẾN THẮNG CUỐI CÙNG SAU KHI ĐÁNH BOSS
@@ -299,7 +299,7 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ GĂNG TAY TÍM CHO MAP TRUNG BÌNH ---
+// --- HÀM VẼ GĂNG TAY TÍM CHUẨN MẪU CHO MAP TRUNG BÌNH ---
 function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.save();
     const colBorder = '#281038';
@@ -526,6 +526,16 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.fillStyle = '#3a0808';
                 ctx.fillRect(x + 8, rimY - 26, 16, 4);
                 ctx.fillRect(x + 32, rimY - 26, 16, 4);
+
+                // GAI NHỌN TRÊN MÁP KHÓ
+                ctx.fillStyle = '#ffffff';
+                for (let i = 0; i < width; i += 8) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + i, rimY + 28);
+                    ctx.lineTo(x + i + 4, rimY + 34);
+                    ctx.lineTo(x + i + 8, rimY + 28);
+                    ctx.fill();
+                }
             } else {
                 let rimY = y;
                 let bodyY = y + 28;
@@ -542,6 +552,16 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
                 ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
+
+                // GAI NHỌN DƯỚI MÁP KHÓ
+                ctx.fillStyle = '#ffffff';
+                for (let i = 0; i < width; i += 8) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + i, rimY);
+                    ctx.lineTo(x + i + 4, rimY - 6);
+                    ctx.lineTo(x + i + 8, rimY);
+                    ctx.fill();
+                }
             }
         }
     }
@@ -550,11 +570,9 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
 
 // --- VẼ BACKGROUND VÀ HIỆU ỨNG BOSS TỐI SẦM ---
 function drawBackgroundCity() {
-    // Nếu đang đánh boss (từ cột 10 trở đi), màn hình tối sầm lại
     if (isBossFight) {
         ctx.fillStyle = '#11051c'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Vẽ trùm Boss Sứa Lửa / Mắt Quỷ đáng sợ ở phía trên
         ctx.save();
         let bossPulse = Math.sin(frames * 0.1) * 10;
         ctx.fillStyle = '#ff3300';
@@ -563,7 +581,6 @@ function drawBackgroundCity() {
         ctx.fill();
         ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4; ctx.stroke();
 
-        // Mắt boss
         ctx.fillStyle = '#ffff00';
         ctx.fillRect(canvas.width / 2 - 15, 70 + bossPulse, 10, 15);
         ctx.fillRect(canvas.width / 2 + 5, 70 + bossPulse, 10, 15);
@@ -571,7 +588,6 @@ function drawBackgroundCity() {
         ctx.fillRect(canvas.width / 2 - 12, 75 + bossPulse, 4, 6);
         ctx.fillRect(canvas.width / 2 + 8, 75 + bossPulse, 4, 6);
 
-        // Thanh máu / Thông báo BOSS BATTLE
         ctx.fillStyle = '#ff0000';
         ctx.fillRect(100, 20, 280, 16);
         ctx.fillStyle = '#ffff00';
@@ -583,7 +599,6 @@ function drawBackgroundCity() {
         ctx.fillText('⚡ BOSS BATTLE: CỘT ' + pipes.pipeCount + '/20 ⚡', canvas.width / 2, 52);
         ctx.restore();
 
-        // Hiệu ứng chớp nháy khi mới chuyển sang boss
         if (bossFlashTimer > 0) {
             ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -592,7 +607,6 @@ function drawBackgroundCity() {
         return;
     }
 
-    // Giao diện bình thường trước cột 10
     if (currentDifficulty === 'EASY') {
         ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#a1e4c3';
