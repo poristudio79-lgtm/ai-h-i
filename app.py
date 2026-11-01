@@ -567,10 +567,11 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.restore();
 }
 
-// --- VẼ BOSS HIỆP SĨ SẮC NÉT GIỐNG HỆT ẢNH MẪU ---
+// --- VẼ BOSS HIỆP SĨ SẮC NÉT (ĐÃ BỎ CÁC VỆT MÀU DƯ THỪA) ---
 function drawDetailedKnightBoss() {
     ctx.save();
-    ctx.fillStyle = '#161022'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Nền tối thuần khiết, sạch sẽ
+    ctx.fillStyle = '#0d0814'; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let bx = canvas.width / 2;
     let by = 260 + (isCinematicEnding ? bossDefeatedAnim * 50 : Math.sin(frames * 0.06) * 10);
@@ -580,8 +581,8 @@ function drawDetailedKnightBoss() {
     ctx.translate(bx, by);
     ctx.rotate(tilt);
 
-    // 1. ÁO CHOÀNG / NỀN SAU GIÁP
-    ctx.fillStyle = '#282236';
+    // 1. TẤM LƯNG / ÁO CHOÀNG PHÍA SAU
+    ctx.fillStyle = '#1e1929';
     ctx.beginPath();
     ctx.roundRect(-125, -110, 250, 220, 20);
     ctx.fill();
@@ -694,7 +695,7 @@ function drawBackgroundCity() {
         }
 
         if (bossFlashTimer > 0) {
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             bossFlashTimer--;
         }
@@ -733,7 +734,7 @@ function drawGround() {
     let grassTop = '#9bd843';
 
     if (isBossFight || isCinematicEnding) {
-        groundCol = '#1a1424'; grassCol = '#4a3070'; grassTop = '#7850a8';
+        groundCol = '#151020'; grassCol = '#3a2850'; grassTop = '#5c3e7e';
     } else if (currentDifficulty === 'NORMAL') {
         groundCol = '#c098d8'; grassCol = '#9a50c8'; grassTop = '#b878e8';
     } else if (currentDifficulty === 'HARD') {
