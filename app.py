@@ -74,6 +74,13 @@ function playSound(type) {
         gain.gain.setValueAtTime(0.2, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
         osc.start(now); osc.stop(now + 0.6);
+    } else if (type === 'slowmo_sword') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.linearRampToValueAtTime(800, now + 1.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 1.5);
+        osc.start(now); osc.stop(now + 1.5);
     } else if (type === 'win') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(523.25, now);
@@ -102,9 +109,12 @@ let frames = 0;
 let selectedSkin = 1;
 let currentDifficulty = 'EASY';
 
-// Biến điều khiển sự kiện Boss Fight
+// Biến điều khiển sự kiện Boss Fight & Cảnh Cinematic Cột 20
 let isBossFight = false;
 let bossFlashTimer = 0;
+let isCinematicEnding = false;
+let cinematicTimer = 0;
+let bossDefeatedAnim = 0;
 
 const CHARACTERS = [
     { id: 0, name: 'GBI', color: '#e82878' },
@@ -239,6 +249,11 @@ const pipes = {
         });
     },
     update() {
+        // Nếu đang trong cảnh cinematic kết thúc thì dừng sinh ống
+        if (isCinematicEnding) return;
+
+        let currentSpeed = isBossFight ? this.speed * 0.7 : this.speed; // Làm chậm một chút khi đánh boss cho ngầu
+
         if (frames % 95 === 0) {
             let maxTop = canvas.height - 80 - this.gap - 50;
             let minTop = 50;
@@ -246,15 +261,14 @@ const pipes = {
             
             this.pipeCount++;
             
-            // KÍCH HOẠT BOSS TỪ CỘT 10 TRỞ ĐI
+            // KÍCH HOẠT BOSS HIỆP SĨ TỪ CỘT 10 TRỞ ĐI
             if (this.pipeCount === 10 && !isBossFight) {
                 isBossFight = true;
-                bossFlashTimer = 60; // Hiệu ứng chớp nháy tối sầm
+                bossFlashTimer = 60;
                 playSound('boss_alert');
-                this.speed += 0.5;
             }
 
-            // CỘT 20 LÀ VẠCH ĐÍCH CHIẾN THẮNG CUỐI CÙNG SAU KHI ĐÁNH BOSS
+            // CỘT 20 KÍCH HOẠT HIỆU ỨNG SLOW-MOTION NHẶT KIẾM & KẾT LIỄU BOSS
             let isFinish = (this.pipeCount === 20);
 
             this.items.push({ 
@@ -266,7 +280,7 @@ const pipes = {
             });
         }
         this.items.forEach((p, index) => {
-            p.x -= this.speed;
+            p.x -= currentSpeed;
 
             let rimExtra = 6;
             if (bird.x + bird.radius > p.x - rimExtra && bird.x - bird.radius < p.x + this.width + rimExtra &&
@@ -277,8 +291,8 @@ const pipes = {
                 p.passed = true; score++; 
 
                 if (p.isFinish) {
-                    playSound('win');
-                    triggerWin();
+                    // Kích hoạt Slow-motion & Cảnh nhặt kiếm chém boss
+                    triggerCinematicEnding();
                 } else {
                     playSound('score');
                 }
@@ -296,10 +310,13 @@ const pipes = {
         this.items = []; 
         this.pipeCount = 0; 
         isBossFight = false; 
+        isCinematicEnding = false;
+        cinematicTimer = 0;
+        bossDefeatedAnim = 0;
     }
 };
 
-// --- HÀM VẼ GĂNG TAY TÍM CHUẨN MẪU CHO MAP TRUNG BÌNH ---
+// --- HÀM VẼ GĂNG TAY TÍM CHO MAP TRUNG BÌNH ---
 function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.save();
     const colBorder = '#281038';
@@ -380,7 +397,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.save();
 
     if (isFinish) {
-        // Cột vạch đích chiến thắng cuối cùng ở cột 20
+        // Cột vạch đích caro chiến thắng ở cột 20
         const sq = 8;
         if (isTop) {
             let bodyH = Math.max(0, height - 28);
@@ -516,17 +533,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(x + 10, rimY - 22, 12, 10);
-                ctx.fillRect(x + 34, rimY - 22, 12, 10);
-                ctx.fillStyle = '#000000';
-                ctx.fillRect(x + 16, rimY - 18, 4, 4);
-                ctx.fillRect(x + 40, rimY - 18, 4, 4);
-
-                ctx.fillStyle = '#3a0808';
-                ctx.fillRect(x + 8, rimY - 26, 16, 4);
-                ctx.fillRect(x + 32, rimY - 26, 16, 4);
-
                 // GAI NHỌN TRÊN MÁP KHÓ
                 ctx.fillStyle = '#ffffff';
                 for (let i = 0; i < width; i += 8) {
@@ -568,36 +574,96 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.restore();
 }
 
-// --- VẼ BACKGROUND VÀ HIỆU ỨNG BOSS TỐI SẦM ---
-function drawBackgroundCity() {
-    if (isBossFight) {
-        ctx.fillStyle = '#11051c'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+// --- VẼ BOSS HIỆP SĨ ĐỨNG NỀN SAU & HIỆU ỨNG CINEMATIC KẾT LIỆU ---
+function drawBossKnightBackground() {
+    ctx.save();
+    // Nền trời tối u ám khi đánh boss
+    ctx.fillStyle = '#110d1c'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let knightX = canvas.width / 2;
+    let knightY = 250 + (isCinematicEnding ? bossDefeatedAnim * 40 : Math.sin(frames * 0.05) * 8);
+    let tiltAngle = isCinematicEnding ? bossDefeatedAnim * 0.4 : 0;
+
+    ctx.save();
+    ctx.translate(knightX, knightY);
+    ctx.rotate(tiltAngle);
+
+    // Thân giáp hiệp sĩ hoành tráng ở nền sau
+    ctx.fillStyle = '#4a5058';
+    ctx.beginPath();
+    ctx.roundRect(-110, -90, 220, 200, 24);
+    ctx.fill();
+    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 5; ctx.stroke();
+
+    // Giáp vai đồ sộ
+    ctx.fillStyle = '#687484';
+    ctx.beginPath();
+    ctx.roundRect(-150, -110, 65, 90, 16);
+    ctx.roundRect(85, -110, 65, 90, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 4; ctx.stroke();
+
+    // Khiên chắn bên phải
+    ctx.fillStyle = '#8a6840';
+    ctx.beginPath();
+    ctx.roundRect(110, -50, 45, 120, 20);
+    ctx.fill();
+    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4; ctx.stroke();
+
+    // Mũ giáp sắt & khe mắt phát sáng
+    ctx.fillStyle = '#3a4048';
+    ctx.beginPath();
+    ctx.roundRect(-55, -150, 110, 100, 40);
+    ctx.fill();
+    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 4; ctx.stroke();
+
+    // Khe mắt đáng sợ
+    ctx.fillStyle = '#ff3300';
+    ctx.fillRect(-28, -110, 20, 8);
+    ctx.fillRect(8, -110, 20, 8);
+    ctx.fillStyle = '#ffff00';
+    ctx.fillRect(-22, -108, 8, 4);
+    ctx.fillRect(14, -108, 8, 4);
+
+    // Miệng lưới giáp
+    ctx.fillStyle = '#222830';
+    ctx.fillRect(-20, -85, 40, 30);
+    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 2;
+    for(let i = -12; i <= 12; i += 8) {
+        ctx.beginPath(); ctx.moveTo(i, -85); ctx.lineTo(i, -55); ctx.stroke();
+    }
+
+    ctx.restore();
+
+    // Thanh kiếm cắm ở cột đích khi ở màn hình Cinematic
+    if (isCinematicEnding) {
         ctx.save();
-        let bossPulse = Math.sin(frames * 0.1) * 10;
-        ctx.fillStyle = '#ff3300';
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 80 + bossPulse, 35, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4; ctx.stroke();
-
-        ctx.fillStyle = '#ffff00';
-        ctx.fillRect(canvas.width / 2 - 15, 70 + bossPulse, 10, 15);
-        ctx.fillRect(canvas.width / 2 + 5, 70 + bossPulse, 10, 15);
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(canvas.width / 2 - 12, 75 + bossPulse, 4, 6);
-        ctx.fillRect(canvas.width / 2 + 8, 75 + bossPulse, 4, 6);
-
-        ctx.fillStyle = '#ff0000';
-        ctx.fillRect(100, 20, 280, 16);
-        ctx.fillStyle = '#ffff00';
-        let bossHpWidth = Math.max(0, 280 * (1 - (pipes.pipeCount - 10) / 10));
-        ctx.fillRect(100, 20, bossHpWidth, 16);
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(100, 20, 280, 16);
-
-        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px "Courier New"'; ctx.textAlign = 'center';
-        ctx.fillText('⚡ BOSS BATTLE: CỘT ' + pipes.pipeCount + '/20 ⚡', canvas.width / 2, 52);
+        ctx.fillStyle = '#d4af37'; // Cán kiếm vàng
+        ctx.fillRect(canvas.width / 2 - 6, 330, 12, 30);
+        ctx.fillStyle = '#c0c0c0'; // Lưỡi kiếm sáng lấp lánh
+        ctx.fillRect(canvas.width / 2 - 4, 270, 8, 65);
         ctx.restore();
+    }
+
+    ctx.restore();
+}
+
+function drawBackgroundCity() {
+    if (isBossFight || isCinematicEnding) {
+        drawBossKnightBackground();
+
+        if (isBossFight && !isCinematicEnding) {
+            // Thanh máu Boss phía trên
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(100, 20, 280, 16);
+            ctx.fillStyle = '#ffff00';
+            let bossHpWidth = Math.max(0, 280 * (1 - (pipes.pipeCount - 10) / 10));
+            ctx.fillRect(100, 20, bossHpWidth, 16);
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(100, 20, 280, 16);
+
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px "Courier New"'; ctx.textAlign = 'center';
+            ctx.fillText('⚡ BOSS HỆP SĨ: CỘT ' + pipes.pipeCount + '/20 ⚡', canvas.width / 2, 52);
+        }
 
         if (bossFlashTimer > 0) {
             ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
@@ -638,8 +704,8 @@ function drawGround() {
     let grassCol = '#75cb27';
     let grassTop = '#9bd843';
 
-    if (isBossFight) {
-        groundCol = '#3a1a4a'; grassCol = '#8838d0'; grassTop = '#b878f0';
+    if (isBossFight || isCinematicEnding) {
+        groundCol = '#22182c'; grassCol = '#5a3888'; grassTop = '#8858c8';
     } else if (currentDifficulty === 'NORMAL') {
         groundCol = '#c098d8'; grassCol = '#9a50c8'; grassTop = '#b878e8';
     } else if (currentDifficulty === 'HARD') {
@@ -947,6 +1013,11 @@ function drawUI() {
         ctx.font = '36px Courier New'; ctx.textAlign = 'center';
         ctx.strokeText(score, canvas.width / 2, 60);
         ctx.fillText(score, canvas.width / 2, 60);
+
+        if (isCinematicEnding) {
+            ctx.fillStyle = '#ffff00'; ctx.font = 'bold 20px "Courier New"';
+            ctx.fillText('⚡ LẤY KIẾM CHÉM BOSS! ⚡', canvas.width / 2, 110);
+        }
     } else if (gameState === 'GAMEOVER') {
         drawGameOverScreen(false);
     } else if (gameState === 'WIN') {
@@ -955,36 +1026,60 @@ function drawUI() {
 }
 
 function triggerGameOver() {
-    if (gameState !== 'GAMEOVER' && gameState !== 'WIN') { 
+    if (gameState !== 'GAMEOVER' && gameState !== 'WIN' && !isCinematicEnding) { 
         playSound('hit'); 
         gameState = 'GAMEOVER'; 
     }
 }
 
-function triggerWin() {
-    if (gameState !== 'WIN') {
-        gameState = 'WIN';
+function triggerCinematicEnding() {
+    if (!isCinematicEnding) {
+        isCinematicEnding = true;
+        cinematicTimer = 0;
+        playSound('slowmo_sword');
     }
 }
 
 function loop() {
-    drawBackgroundCity();
+    // Xử lý hiệu ứng Slow-motion & hoạt ảnh nhặt kiếm chém boss gục xuống
+    if (isCinematicEnding) {
+        cinematicTimer++;
+        bossDefeatedAnim = Math.min(1.0, bossDefeatedAnim + 0.015); // Tốc độ slowmo gục xuống từ từ
 
-    if (gameState === 'PLAYING') {
+        // Chim bay tự động nhẹ nhàng đến giữa màn hình để nhặt kiếm
+        if (bird.x < canvas.width / 2) {
+            bird.x += 0.8;
+        }
+        bird.y += (canvas.height / 2 - bird.y) * 0.05;
+        bird.velocity = 0;
+
+        if (cinematicTimer > 180) { // Sau khi hoàn tất cảnh slow-motion
+            triggerWin();
+        }
+    } else if (gameState === 'PLAYING') {
         bird.update();
         pipes.update();
     }
+    
     frames++;
 
+    drawBackgroundCity();
     pipes.draw(); 
     drawGround();
 
-    if (gameState === 'PLAYING') {
+    if (gameState === 'PLAYING' || isCinematicEnding) {
         bird.draw();
     }
     drawUI();
 
     requestAnimationFrame(loop);
+}
+
+function triggerWin() {
+    if (gameState !== 'WIN') {
+        playSound('win');
+        gameState = 'WIN';
+    }
 }
 
 // --- TƯƠNG TÁC ĐIỀU KHIỂN ---
@@ -1052,7 +1147,7 @@ function handleInteraction(clientX, clientY) {
         }
     } 
     else if (gameState === 'PLAYING') {
-        bird.jump();
+        if (!isCinematicEnding) bird.jump();
     } 
     else if (gameState === 'GAMEOVER' || gameState === 'WIN') {
         if (clickX >= gameOverOkBtn.x && clickX <= gameOverOkBtn.x + gameOverOkBtn.w &&
@@ -1074,6 +1169,9 @@ function startGame() {
     score = 0; 
     frames = 0; 
     isNewHighScore = false;
+    isCinematicEnding = false;
+    cinematicTimer = 0;
+    bossDefeatedAnim = 0;
     gameState = 'PLAYING'; 
     bird.jump();
 }
@@ -1089,7 +1187,7 @@ window.addEventListener('keydown', (e) => {
         } else if (gameState === 'CHARACTERS') {
             gameState = 'START';
         } else if (gameState === 'PLAYING') {
-            bird.jump();
+            if (!isCinematicEnding) bird.jump();
         } else if (gameState === 'GAMEOVER' || gameState === 'WIN') {
             startGame();
         } else {
