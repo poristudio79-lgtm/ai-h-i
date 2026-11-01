@@ -95,96 +95,92 @@ const CHARACTERS = [
 const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
 const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
 
-// --- HÀM VẼ NHÂN VẬT PIXEL ---
-function drawPixelBird(x, y, skinId, scale = 2, rotation = 0) {
+// --- HÀM VẼ NHÂN VẬT PIXEL SIÊU RÕ NÉT ---
+function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
     ctx.save();
     ctx.translate(x, y);
-    ctx.rotate(rotation); // Xoay góc theo hiệu ứng bay lên/rơi xuống
+    ctx.rotate(rotation);
     const p = scale;
 
-    if (skinId === 0) {
-        ctx.fillStyle = '#4a403a'; ctx.fillRect(-8*p, -7*p, 16*p, 13*p);
+    if (skinId === 0) { // GBI
+        ctx.fillStyle = '#2b221e'; ctx.fillRect(-8*p, -7*p, 16*p, 13*p);
         ctx.fillStyle = '#f8ea38'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#e82878'; ctx.fillRect(-7*p, -7*p, 14*p, 3*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-4*p, -7*p, 2*p, 3*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -4*p, 7*p, 5*p);
-        ctx.fillStyle = '#4a403a'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
+        ctx.fillStyle = '#2b221e'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
         ctx.fillStyle = '#e82878'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, 0*p, 4*p, 3*p);
     } 
-    else if (skinId === 1) {
-        ctx.fillStyle = '#4a403a'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
+    else if (skinId === 1) { // OHINH (Vàng gốc)
+        ctx.fillStyle = '#2b221e'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#f8d038'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f8b000'; ctx.fillRect(-6*p, 2*p, 10*p, 2*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -6*p, 7*p, 6*p);
-        ctx.fillStyle = '#4a403a'; ctx.fillRect(3*p, -4*p, 2*p, 3*p);
+        ctx.fillStyle = '#2b221e'; ctx.fillRect(3*p, -4*p, 2*p, 3*p);
         ctx.fillStyle = '#f85820'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     } 
-    else if (skinId === 2) {
-        ctx.fillStyle = '#303030'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
+    else if (skinId === 2) { // HOI BINK
+        ctx.fillStyle = '#1e2b1e'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#509848'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#78c038'; ctx.fillRect(-5*p, -10*p, 10*p, 4*p); ctx.fillRect(-7*p, -7*p, 14*p, 2*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -5*p, 7*p, 6*p);
-        ctx.fillStyle = '#303030'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
+        ctx.fillStyle = '#1e2b1e'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
         ctx.fillStyle = '#f87820'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 3) {
-        ctx.fillStyle = '#302040'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
+    else if (skinId === 3) { // KHON
+        ctx.fillStyle = '#261933'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#8838d0'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f858a8'; ctx.fillRect(-6*p, -10*p, 11*p, 4*p);
         ctx.fillRect(-7*p, -8*p, 2*p, 2*p); ctx.fillRect(-2*p, -8*p, 2*p, 2*p); ctx.fillRect(3*p, -8*p, 2*p, 2*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -5*p, 7*p, 6*p);
-        ctx.fillStyle = '#302040'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
+        ctx.fillStyle = '#261933'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
         ctx.fillStyle = '#f89020'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#f878c0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 4) {
-        ctx.fillStyle = '#203840'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
+    else if (skinId === 4) { // BINH
+        ctx.fillStyle = '#16282b'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#38a8b8'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#c048d0'; ctx.fillRect(3*p, -11*p, 3*p, 5*p);
         ctx.fillStyle = '#f878e8'; ctx.fillRect(4*p, -9*p, 2*p, 2*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -5*p, 7*p, 6*p);
-        ctx.fillStyle = '#203840'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
+        ctx.fillStyle = '#16282b'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
         ctx.fillStyle = '#306870'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#78e0f0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 5) {
-        ctx.fillStyle = '#103038'; ctx.fillRect(-10*p, -4*p, 20*p, 10*p);
+    else if (skinId === 5) { // NARWHAL
+        ctx.fillStyle = '#0a1e24'; ctx.fillRect(-10*p, -4*p, 20*p, 10*p);
         ctx.fillStyle = '#20b2aa'; ctx.fillRect(-9*p, -3*p, 18*p, 8*p);
         ctx.fillStyle = '#e0f8f8'; ctx.fillRect(-9*p, 1*p, 18*p, 4*p);
-        ctx.fillStyle = '#e0e0e0'; ctx.fillRect(7*p, -7*p, 2*p, 6*p); ctx.fillRect(8*p, -9*p, 2*p, 3*p);
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(7*p, -7*p, 2*p, 6*p); ctx.fillRect(8*p, -9*p, 2*p, 3*p);
         ctx.fillStyle = '#20b2aa'; ctx.fillRect(-13*p, -6*p, 4*p, 6*p); ctx.fillRect(-13*p, 2*p, 4*p, 6*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(1*p, -3*p, 5*p, 5*p);
-        ctx.fillStyle = '#103038'; ctx.fillRect(3*p, -2*p, 2*p, 3*p);
+        ctx.fillStyle = '#0a1e24'; ctx.fillRect(3*p, -2*p, 2*p, 3*p);
     }
 
     ctx.restore();
 }
 
-// --- ĐỐI TƯỢNG CHIM VỚI HIỆU ỨNG RƠI / BAY ---
+// --- ĐỐI TƯỢNG CHIM ---
 const bird = {
-    x: 90, y: 250, radius: 12, gravity: 0.28, jumpForce: -5.2, velocity: 0,
+    x: 90, y: 250, radius: 14, gravity: 0.28, jumpForce: -5.2, velocity: 0,
     
     draw() {
-        // Tính góc xoay đầu chim dựa trên vận tốc (Bay lên ngẩng đầu, Rơi xuống cắm đầu)
         let rotation = Math.min(Math.PI / 2.5, Math.max(-Math.PI / 4, (this.velocity / 12)));
-        drawPixelBird(this.x, this.y, selectedSkin, 1.8, rotation);
+        drawPixelBird(this.x, this.y, selectedSkin, 2.2, rotation);
     },
 
     update() {
-        // Hiệu ứng rơi xuống: Tăng dần vận tốc theo trọng lực
         this.velocity += this.gravity;
         this.y += this.velocity;
 
-        // Giới hạn trần màn hình
         if (this.y - this.radius <= 0) {
             this.y = this.radius;
             this.velocity = 0;
         }
 
-        // Chạm đất -> Game Over
         if (this.y + this.radius >= canvas.height - 80) {
             this.y = canvas.height - 80 - this.radius;
             triggerGameOver();
@@ -192,7 +188,6 @@ const bird = {
     },
 
     jump() {
-        // Hiệu ứng bay lên: Gán lực âm để đẩy chim vọt lên cao lập tức
         this.velocity = this.jumpForce;
         playSound('jump');
     },
@@ -333,7 +328,7 @@ function drawMenuButton(btn, isPlayBtn) {
         ctx.fillStyle = '#54cb37';
         ctx.beginPath(); ctx.moveTo(cx - 16, cy - 22); ctx.lineTo(cx + 12, cy); ctx.lineTo(cx - 16, cy); ctx.closePath(); ctx.fill();
     } else {
-        drawPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.2);
+        drawPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.4);
     }
 }
 
@@ -349,7 +344,7 @@ function drawMainMenu() {
     ctx.restore();
 
     let floatY = 230 + Math.sin(frames * 0.08) * 8;
-    drawPixelBird(canvas.width / 2, floatY, selectedSkin, 2.5);
+    drawPixelBird(canvas.width / 2, floatY, selectedSkin, 3.0);
 
     drawMenuButton(menuPlayBtn, true);
     drawMenuButton(menuCharBtn, false);
@@ -390,7 +385,8 @@ function drawCharacterMenu() {
             ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(bx, by, boxW, boxH);
         }
 
-        drawPixelBird(bx + boxW / 2, by + 38, i, 1.8);
+        // Vẽ nhân vật trong menu to rõ nét hơn
+        drawPixelBird(bx + boxW / 2, by + 38, i, 2.2);
 
         ctx.fillStyle = isSelected ? '#d49b00' : '#457a82';
         ctx.fillRect(bx + 10, by + 72, boxW - 20, 18);
@@ -430,7 +426,7 @@ function drawUI() {
         ctx.strokeText('GAME OVER', canvas.width / 2, 180);
         ctx.fillText('GAME OVER', canvas.width / 2, 180);
 
-        drawPixelBird(canvas.width / 2, 230, selectedSkin, 2.2, 0.5);
+        drawPixelBird(canvas.width / 2, 230, selectedSkin, 2.6, 0.5);
 
         ctx.font = '18px Courier New';
         ctx.strokeText(`Điểm: ${score}`, canvas.width / 2, 290);
