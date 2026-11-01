@@ -542,7 +542,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 let bodyH = Math.max(0, canvas.height - bodyY);
                 let rX = x - 3, rW = width + 6;
                 ctx.fillStyle = colMainRed; ctx.fillRect(x, bodyY, width, bodyH);
-                ctx.fillStyle = colLightRed; ctx.fillRect(rX + 4, bodyY, 10, bodyH);
+                ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, bodyY, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
                 ctx.fillStyle = colDarkRed; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
@@ -567,10 +567,13 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.restore();
 }
 
-// --- VẼ BOSS HIỆP SĨ SẮC NÉT ---
+// --- VẼ BOSS HIỆP SĨ SẮC NÉT (CÓ HIỆU ỨNG MẮT PHÁT SÁNG RỰC LỬA KHI CHƠI MAP KHÓ) ---
 function drawDetailedKnightBoss() {
     ctx.save();
-    ctx.fillStyle = '#0d0814'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Nếu chơi Map Khó, nền tối sẽ có ánh đỏ rực rỡ hơn
+    let isHardMap = (currentDifficulty === 'HARD');
+    ctx.fillStyle = isHardMap ? '#1c0a0c' : '#0d0814'; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let bx = canvas.width / 2;
     let by = 260 + (isCinematicEnding ? bossDefeatedAnim * 50 : Math.sin(frames * 0.06) * 10);
@@ -632,6 +635,7 @@ function drawDetailedKnightBoss() {
     ctx.fill();
     ctx.strokeStyle = '#8898a8'; ctx.lineWidth = 2; ctx.stroke();
 
+    // MŨ GIÁP SẮT (HELMET)
     ctx.fillStyle = armorBase;
     ctx.beginPath(); ctx.roundRect(-65, -165, 130, 110, 44); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
@@ -640,12 +644,25 @@ function drawDetailedKnightBoss() {
     ctx.fillRect(-12, -165, 24, 110);
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 2; ctx.strokeRect(-12, -165, 24, 110);
 
-    ctx.fillStyle = '#ff1100';
-    ctx.fillRect(-35, -125, 22, 10);
-    ctx.fillRect(13, -125, 22, 10);
+    // --- ĐÔI MẮT PHÁT SÁNG RỰC LỬA (ĐẶC BIỆT NỔI BẬT Ở MAP KHÓ) ---
+    let eyeGlow = isHardMap ? (Math.sin(frames * 0.15) * 2 + 6) : 0; // Hiệu ứng nhấp nháy lửa ở map khó
+    
+    // Đốm sáng rực xung quanh mắt ở Map Khó
+    if (isHardMap) {
+        ctx.fillStyle = 'rgba(255, 60, 0, 0.4)';
+        ctx.beginPath(); ctx.arc(-24, -120, 18 + eyeGlow, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(24, -120, 18 + eyeGlow, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Viền mắt chính
+    ctx.fillStyle = isHardMap ? '#ff3300' : '#ff1100';
+    ctx.fillRect(-36 - (isHardMap ? 2 : 0), -126, 26 + (isHardMap ? 4 : 0), 12);
+    ctx.fillRect(10 - (isHardMap ? 2 : 0), -126, 26 + (isHardMap ? 4 : 0), 12);
+    
+    // Tâm mắt sáng lóa
     ctx.fillStyle = '#ffff00';
-    ctx.fillRect(-28, -122, 10, 4);
-    ctx.fillRect(20, -122, 10, 4);
+    ctx.fillRect(-28, -123, 10, 6);
+    ctx.fillRect(18, -123, 10, 6);
 
     ctx.fillStyle = '#222830';
     ctx.fillRect(-22, -95, 44, 32);
@@ -704,7 +721,6 @@ function drawBackgroundCity() {
         ctx.fill();
     } 
     else if (currentDifficulty === 'NORMAL') {
-        // Đã loại bỏ hoàn toàn các khối/vệt màu tím dư thừa ở nền, giờ chỉ còn nền trời hồng/tím nhạt sạch sẽ
         ctx.fillStyle = '#e8b0d8'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     } 
     else if (currentDifficulty === 'HARD') {
@@ -790,9 +806,10 @@ function drawDifficultyMenu() {
     ctx.fillStyle = '#f8d038'; ctx.fillText('CHỌN ĐỘ KHÓ', titleX, titleY);
     ctx.restore();
 
-    drawDiffButton(diffEasyBtn, 'DỄ (MAP GIỮA)', '#54cb37');
-    drawDiffButton(diffNormalBtn, 'TRUNG BÌNH (TÍM)', '#9a50c8');
-    drawDiffButton(diffHardBtn, 'KHÓ (MAP ĐỎ)', '#d83838');
+    // Đã xóa bỏ các chú thích "(MAP GIỮA)", "(TÍM)", "(MAP ĐỎ)" theo yêu cầu
+    drawDiffButton(diffEasyBtn, 'DỄ', '#54cb37');
+    drawDiffButton(diffNormalBtn, 'TRUNG BÌNH', '#9a50c8');
+    drawDiffButton(diffHardBtn, 'KHÓ', '#d83838');
     drawDiffButton(diffBackBtn, 'QUAY LẠI', '#555555');
 }
 
