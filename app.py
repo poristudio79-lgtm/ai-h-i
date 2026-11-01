@@ -77,11 +77,11 @@ function playSound(type) {
 }
 
 // --- TRẠNG THÁI GAME ---
-let gameState = 'START';
+let gameState = 'START'; // START, CHARACTERS, PLAYING, GAMEOVER
 let score = 0;
 let highScore = localStorage.getItem('fb_highscore') || 0;
 let frames = 0;
-let selectedSkin = 1;
+let selectedSkin = 1; // Mặc định là OHINH
 
 const CHARACTERS = [
     { id: 0, name: 'GBI', color: '#e82878' },
@@ -92,7 +92,11 @@ const CHARACTERS = [
     { id: 5, name: 'NARWHAL', color: '#20b2aa' }
 ];
 
-// --- HÀM VẼ NHÂN VẬT ---
+// Nút bấm trên Menu chính
+const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
+const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
+
+// --- HÀM VẼ NHÂN VẬT PIXEL ---
 function drawPixelBird(x, y, skinId, scale = 2) {
     ctx.save();
     ctx.translate(x, y);
@@ -304,9 +308,8 @@ const pipes = {
     reset() { this.items = []; }
 };
 
-// --- TÁCH HÀM VẼ NỀN THÀNH PHỐ VÀ MẶT ĐẤT ---
+// --- NỀN THÀNH PHỐ VÀ MẶT ĐẤT CARO ---
 function drawBackgroundCity() {
-    // 1. Núi/mây xa
     ctx.fillStyle = '#a1e4c3';
     ctx.beginPath();
     ctx.arc(60, 520, 70, 0, Math.PI * 2);
@@ -315,7 +318,6 @@ function drawBackgroundCity() {
     ctx.arc(440, 530, 75, 0, Math.PI * 2);
     ctx.fill();
 
-    // 2. Tòa nhà chọc trời ở NỀN ĐẰNG SAU
     ctx.fillStyle = '#83d8b4';
     ctx.fillRect(20, 480, 40, 80);
     ctx.fillRect(80, 450, 50, 110);
@@ -326,16 +328,97 @@ function drawBackgroundCity() {
 }
 
 function drawGround() {
-    // Chỉ vẽ phần mặt đất bên dưới đáy
     ctx.fillStyle = '#ded895'; ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
     ctx.strokeStyle = '#232b1a'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(0, canvas.height - 80); ctx.lineTo(canvas.width, canvas.height - 80); ctx.stroke();
     
+    // Đất kẻ sọc caro vàng xanh chuẩn Flappy Bird gốc
     ctx.fillStyle = '#75cb27'; ctx.fillRect(0, canvas.height - 80, canvas.width, 16);
-    ctx.fillStyle = '#549c1b'; ctx.fillRect(0, canvas.height - 68, canvas.width, 4);
+    
+    ctx.fillStyle = '#9bd843';
+    for (let i = 0; i < canvas.width; i += 24) {
+        ctx.beginPath();
+        ctx.moveTo(i, canvas.height - 80);
+        ctx.lineTo(i + 12, canvas.height - 80);
+        ctx.lineTo(i - 4, canvas.height - 64);
+        ctx.lineTo(i - 16, canvas.height - 64);
+        ctx.fill();
+    }
 }
 
-// --- MENU CHỌN NHÂN VẬT ---
+// --- V VẼ NÚT 3D CHUẨN MẸO HÌNH MẪU ---
+function drawMenuButton(btn, isPlayBtn) {
+    // 1. Khung ngoài Bo Góc màu trắng kem
+    ctx.fillStyle = '#f8f8f8';
+    ctx.strokeStyle = '#2b2b2b';
+    ctx.lineWidth = 4;
+    
+    ctx.beginPath();
+    ctx.roundRect(btn.x, btn.y, btn.w, btn.h, 16);
+    ctx.fill();
+    ctx.stroke();
+
+    // Đổ bóng gradient nhẹ dưới nút
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.beginPath();
+    ctx.roundRect(btn.x + 4, btn.y + btn.h / 2, btn.w - 8, btn.h / 2 - 4, [0, 0, 12, 12]);
+    ctx.fill();
+
+    if (isPlayBtn) {
+        // Biểu tượng tam giác XANH LÁ (Play)
+        let cx = btn.x + btn.w / 2 - 4;
+        let cy = btn.y + btn.h / 2;
+
+        ctx.fillStyle = '#00a844';
+        ctx.beginPath();
+        ctx.moveTo(cx - 16, cy - 22);
+        ctx.lineTo(cx + 22, cy);
+        ctx.lineTo(cx - 16, cy + 22);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#54cb37';
+        ctx.beginPath();
+        ctx.moveTo(cx - 16, cy - 22);
+        ctx.lineTo(cx + 12, cy);
+        ctx.lineTo(cx - 16, cy);
+        ctx.closePath();
+        ctx.fill();
+    } else {
+        // Biểu tượng chọn NHÂN VẬT (Thay cho BXH)
+        drawPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.2);
+    }
+}
+
+// --- MENU CHÍNH CHUẨN 100% THEO HÌNH MẪU ---
+function drawMainMenu() {
+    // 1. Logo FlappyBird 3D Chuẩn gốc
+    let titleX = canvas.width / 2;
+    let titleY = 130;
+
+    ctx.save();
+    ctx.font = '900 48px "Courier New", sans-serif';
+    ctx.textAlign = 'center';
+
+    // Đổ bóng đen đậm
+    ctx.fillStyle = '#000000';
+    ctx.fillText('FlappyBird', titleX + 4, titleY + 4);
+
+    // Chữ trắng tinh
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('FlappyBird', titleX, titleY);
+    ctx.restore();
+
+    // 2. Chú chim nhún nhảy ở giữa màn hình
+    let floatY = 230 + Math.sin(frames * 0.08) * 8;
+    drawPixelBird(canvas.width / 2, floatY, selectedSkin, 2.5);
+
+    // 3. Vẽ 2 Nút bấm (Play & Chọn Nhân Vật)
+    drawMenuButton(menuPlayBtn, true);
+    drawMenuButton(menuCharBtn, false);
+}
+
+// --- BẢNG POPUP CHỌN NHÂN VẬT ---
 function drawCharacterMenu() {
     let panelX = 30, panelY = 40, panelW = 420, panelH = 550;
     
@@ -362,11 +445,6 @@ function drawCharacterMenu() {
         ctx.fillStyle = colors[i % colors.length];
         ctx.fillText(titleText[i], startX + i * 24, panelY + 60);
     }
-
-    drawStar(panelX + 70, panelY + 45, '#f8d038');
-    drawStar(panelX + 350, panelY + 50, '#f8d038');
-    drawStar(panelX + 40, panelY + 160, '#f8d038');
-    drawStar(panelX + 380, panelY + 280, '#f8d038');
 
     const startGridX = 55, startGridY = 130, boxW = 110, boxH = 120, gapX = 20, gapY = 25;
 
@@ -416,37 +494,17 @@ function drawCharacterMenu() {
         ctx.fillText('CHỌN', bx + boxW / 2, by + 107);
     });
 
-    const bottomBtns = ['CHƠI NGAY', 'CỬA HÀNG', 'BXH', 'CÀI ĐẶT'];
-    const btnW = 85, btnH = 32, btnGap = 10;
-    let bStartX = 52, bY = 530;
-
-    bottomBtns.forEach((btnText, idx) => {
-        let bx = bStartX + idx * (btnW + btnGap);
-        ctx.fillStyle = '#e0f8f8';
-        ctx.fillRect(bx, bY, btnW, btnH);
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(bx, bY, btnW, btnH);
-
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 11px "Courier New"';
-        ctx.fillText(btnText, bx + btnW / 2, bY + 20);
-    });
-}
-
-function drawStar(cx, cy, color) {
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillRect(cx - 6, cy - 1, 12, 2);
-    ctx.fillRect(cx - 1, cy - 6, 2, 12);
-    ctx.restore();
+    // Nút BẮT ĐẦU CHƠI ở góc dưới popup
+    ctx.fillStyle = '#75cb27'; ctx.fillRect(140, 530, 200, 45);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(140, 530, 200, 45);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 18px "Courier New"';
+    ctx.fillText('BẮT ĐẦU CHƠI', canvas.width / 2, 558);
 }
 
 function drawUI() {
-    if (gameState === 'START' || gameState === 'CHARACTERS') {
+    if (gameState === 'START') {
+        drawMainMenu();
+    } else if (gameState === 'CHARACTERS') {
         drawCharacterMenu();
     } else if (gameState === 'PLAYING') {
         ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
@@ -477,25 +535,19 @@ function triggerGameOver() {
     if (gameState !== 'GAMEOVER') { playSound('hit'); gameState = 'GAMEOVER'; }
 }
 
-// --- VÒNG LẶP CHÍNH CHUẨN LỚP ĐỒ HỌA ---
+// --- VÒNG LẶP CHÍNH ---
 function loop() {
-    // 1. Vẽ bầu trời
     ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // 2. Vẽ thành phố ở NỀN ĐẰNG SAU CÙNG
     drawBackgroundCity();
 
     if (gameState === 'PLAYING') {
-        bird.update(); pipes.update(); frames++;
+        bird.update(); pipes.update();
     }
+    frames++;
 
-    // 3. Vẽ ỐNG CỐNG NỔI TRÊN THÀNH PHỐ
     pipes.draw(); 
-
-    // 4. Vẽ MẶT ĐẤT CHÈN NÔNG TRÊN CHÂN ỐNG CỐNG
     drawGround();
 
-    // 5. Vẽ Chim và Giao diện UI
     if (gameState === 'PLAYING') bird.draw();
     drawUI();
 
@@ -508,7 +560,23 @@ function handleInteraction(clientX, clientY) {
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
 
-    if (gameState === 'START' || gameState === 'CHARACTERS') {
+    if (gameState === 'START') {
+        // Nút Bắt Đầu (Play)
+        if (clickX >= menuPlayBtn.x && clickX <= menuPlayBtn.x + menuPlayBtn.w &&
+            clickY >= menuPlayBtn.y && clickY <= menuPlayBtn.y + menuPlayBtn.h) {
+            bird.reset(); pipes.reset(); score = 0; frames = 0;
+            gameState = 'PLAYING'; bird.jump();
+            return;
+        }
+        // Nút Chọn Nhân Vật
+        if (clickX >= menuCharBtn.x && clickX <= menuCharBtn.x + menuCharBtn.w &&
+            clickY >= menuCharBtn.y && clickY <= menuCharBtn.y + menuCharBtn.h) {
+            gameState = 'CHARACTERS';
+            playSound('score');
+            return;
+        }
+    } 
+    else if (gameState === 'CHARACTERS') {
         const startGridX = 55, startGridY = 130, boxW = 110, boxH = 120, gapX = 20, gapY = 25;
 
         CHARACTERS.forEach((char, i) => {
@@ -522,9 +590,8 @@ function handleInteraction(clientX, clientY) {
             }
         });
 
-        const btnW = 85, btnH = 32, bStartX = 52, bY = 530;
-        let playBtnX = bStartX;
-        if (clickX >= playBtnX && clickX <= playBtnX + btnW && clickY >= bY && clickY <= bY + btnH) {
+        // Nút BẮT ĐẦU CHƠI
+        if (clickX >= 140 && clickX <= 340 && clickY >= 530 && clickY <= 575) {
             bird.reset(); pipes.reset(); score = 0; frames = 0;
             gameState = 'PLAYING'; bird.jump();
         }
@@ -541,7 +608,10 @@ function handleInteraction(clientX, clientY) {
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
-        if (gameState === 'START' || gameState === 'CHARACTERS') {
+        if (gameState === 'START') {
+            bird.reset(); pipes.reset(); score = 0; frames = 0;
+            gameState = 'PLAYING'; bird.jump();
+        } else if (gameState === 'CHARACTERS') {
             bird.reset(); pipes.reset(); score = 0; frames = 0;
             gameState = 'PLAYING'; bird.jump();
         } else {
