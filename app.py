@@ -86,10 +86,10 @@ let selectedSkin = 1;
 let currentDifficulty = 'EASY';
 
 const CHARACTERS = [
-    { id: 0, name: 'GBI', color: '#e82878', effect: 'Hào quang Hồng' },
-    { id: 1, name: 'OHINH', color: '#f8d038', effect: 'Tia chớp Vàng' },
-    { id: 2, name: 'HOI BINK', color: '#509848', effect: 'Lá rơi Xanh' },
-    { id: 3, name: 'KHON', color: '#8838d0', effect: 'Hỏa diệm Tím' },
+    { id: 0, name: 'GBI', color: '#e82878', effect: 'Hào quang Đôi' },
+    { id: 1, name: 'OHINH', color: '#f8d038', effect: 'Tia chớp Sét' },
+    { id: 2, name: 'HOI BINK', color: '#509848', effect: 'Lá mầm Xanh' },
+    { id: 3, name: 'KHON', color: '#8838d0', effect: 'Hỏa diệm Bùng' },
     { id: 4, name: 'BINH', color: '#38a8b8', effect: 'Bong bóng Nước' },
     { id: 5, name: 'NARWHAL', color: '#20b2aa', effect: 'Băng giá Tuyết' }
 ];
@@ -173,58 +173,93 @@ function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
     ctx.restore();
 }
 
-// --- VẼ HIỆU ỨNG ĐỘC QUYỀN CHO TỪNG SKIN ---
+// --- HIỆU ỨNG ĐỘC QUYỀN RÕ NÉT & SẮC SẢO CHO TỪNG SKIN ---
 function drawSkinEffects(x, y, skinId) {
     ctx.save();
-    let time = frames * 0.1;
+    let time = frames * 0.12;
 
     if (skinId === 0) {
-        ctx.strokeStyle = 'rgba(232, 40, 120, 0.6)';
-        ctx.lineWidth = 3;
+        // GBI: Hào quang đôi phát sáng nhấp nháy sắc nét
+        ctx.strokeStyle = 'rgba(255, 60, 150, 0.8)';
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
-        ctx.arc(x, y, 22 + Math.sin(time) * 4, 0, Math.PI * 2);
+        ctx.arc(x, y, 22 + Math.sin(time) * 5, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 200, 230, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, 28 + Math.cos(time) * 4, 0, Math.PI * 2);
         ctx.stroke();
     } 
     else if (skinId === 1) {
-        if (frames % 15 < 8) {
-            ctx.fillStyle = '#ffff00';
-            ctx.fillRect(x - 20 + Math.random() * 10, y - 20 + Math.random() * 10, 6, 6);
+        // OHINH: Tia chớp vàng sắc lẹm xẹt ngang dọc
+        if (frames % 12 < 7) {
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 24, y - 10);
+            ctx.lineTo(x - 8, y + 12);
+            ctx.lineTo(x + 12, y - 6);
+            ctx.lineTo(x + 24, y + 15);
+            ctx.stroke();
+
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(x + 10, y - 15, 4, 4);
+            ctx.fillRect(x + 10, y - 15, 5, 5);
         }
     } 
     else if (skinId === 2) {
-        for (let i = 0; i < 3; i++) {
-            let lx = x - 15 - (i * 12 + (frames * 2) % 30);
-            let ly = y + Math.sin(time + i) * 15;
-            ctx.fillStyle = '#78c038';
-            ctx.fillRect(lx, ly, 6, 4);
+        // HOI BINK: Lá cây mầm xanh mướt bay lượn xoay vòng
+        for (let i = 0; i < 4; i++) {
+            let angle = time + i * (Math.PI / 2);
+            let lx = x - 18 + Math.cos(angle) * 16;
+            let ly = y + Math.sin(angle) * 14;
+            ctx.fillStyle = (i % 2 === 0) ? '#78c038' : '#b8e637';
+            ctx.fillRect(lx, ly, 7, 5);
         }
     } 
     else if (skinId === 3) {
-        ctx.fillStyle = 'rgba(136, 56, 208, 0.7)';
+        // KHON: Hỏa diệm tím rực cháy mãnh liệt phía sau đuôi
+        let flamePulse = Math.sin(time * 3) * 4;
+        ctx.fillStyle = 'rgba(248, 88, 168, 0.9)';
         ctx.beginPath();
-        ctx.arc(x - 10, y + 8 + Math.sin(time * 2) * 5, 8, 0, Math.PI * 2);
+        ctx.arc(x - 14, y + 6, 10 + flamePulse, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = 'rgba(248, 88, 168, 0.5)';
+
+        ctx.fillStyle = 'rgba(136, 56, 208, 0.8)';
         ctx.beginPath();
-        ctx.arc(x - 14, y + 4, 5, 0, Math.PI * 2);
+        ctx.arc(x - 20, y + 2, 7, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x - 16, y + 4, 4, 4);
     } 
     else if (skinId === 4) {
-        let bx = x - 18 - ((frames * 1.5) % 35);
-        let by = y + Math.cos(time) * 12;
-        ctx.fillStyle = 'rgba(120, 224, 240, 0.7)';
-        ctx.beginPath(); ctx.arc(bx, by, 5, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.arc(bx - 1, by - 1, 2, 0, Math.PI * 2); ctx.stroke();
+        // BINH: Bong bóng nước đa tầng lấp lánh phản chiếu ánh sáng
+        let bx = x - 20 - ((frames * 1.8) % 40);
+        let by = y + Math.sin(time * 1.5) * 14;
+        
+        ctx.strokeStyle = 'rgba(120, 224, 240, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(bx, by, 7, 0, Math.PI * 2); ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillRect(bx - 3, by - 3, 3, 3);
+
+        let bx2 = x - 12 - ((frames * 1.2) % 25);
+        let by2 = y - 10 + Math.cos(time) * 10;
+        ctx.strokeStyle = 'rgba(120, 224, 240, 0.7)';
+        ctx.beginPath(); ctx.arc(bx2, by2, 4, 0, Math.PI * 2); ctx.stroke();
     } 
     else if (skinId === 5) {
-        for (let i = 0; i < 3; i++) {
-            let tx = x - 10 - (i * 10 + (frames * 1.8) % 25);
-            let ty = y - 15 + (i * 12 + frames) % 30;
+        // NARWHAL: Tinh thể băng giá tuyết lấp lánh sắc nét
+        for (let i = 0; i < 4; i++) {
+            let tx = x - 12 - (i * 12 + (frames * 2) % 30);
+            let ty = y - 18 + (i * 10 + frames * 1.5) % 35;
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(tx, ty, 4, 4);
+            ctx.fillRect(tx, ty, 5, 5);
+            ctx.fillStyle = '#20b2aa';
+            ctx.fillRect(tx + 1, ty + 1, 3, 3);
         }
     }
     ctx.restore();
@@ -282,7 +317,7 @@ const pipes = {
             let top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
             
             this.pipeCounter++;
-            let isInfinite = (this.pipeCounter % 5 === 0); // Cứ mỗi 5 cột sẽ xuất hiện cột vô hạn
+            let isInfinite = (this.pipeCounter % 5 === 0);
 
             this.items.push({ 
                 x: canvas.width, 
@@ -416,12 +451,11 @@ function drawHardPipeEyes(x, rimY, rW, isTop) {
     ctx.restore();
 }
 
-// --- HỆ THỐNG VẼ CỐNG (THAY CỘT CARO BẰNG CỘT VÔ HẠN KÉO DÀI XUYÊN SUỐT) ---
+// --- HỆ THỐNG VẼ CỐNG ---
 function drawPipesByTheme(x, y, width, height, isTop, isInfinite, difficulty) {
     ctx.save();
 
     if (isInfinite) {
-        // Cột Vô Hạn: Kiểu dáng năng lượng không giới hạn với viền sáng rực rỡ và hiệu ứng chạy dọc
         const infColorMain = '#112233';
         const infColorGlow = '#00ffff';
         const infColorCore = '#ffffff';
@@ -431,7 +465,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isInfinite, difficulty) {
             ctx.fillStyle = infColorMain; ctx.fillRect(x, 0, width, bodyH);
             ctx.strokeStyle = infColorGlow; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
-            // Các đường sọc năng lượng chạy vô hạn
             ctx.fillStyle = infColorCore;
             let offset = (frames * 3) % 20;
             for (let sy = -20 + offset; sy < bodyH; sy += 20) {
