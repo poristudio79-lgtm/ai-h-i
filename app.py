@@ -202,7 +202,7 @@ const bird = {
     reset() { this.y = 250; this.velocity = 0; }
 };
 
-// --- QUẢN LÝ ỐNG CỐNG & ĐỘ KHÓ ---
+// --- QUẢN LÝ ỐNG CỐNG & ĐỘ KHÓ (THẮNG Ở CỘT THỨ 10) ---
 const pipes = {
     items: [], gap: 130, width: 56, speed: 2.2, pipeCount: 0,
     
@@ -233,7 +233,8 @@ const pipes = {
             let top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
             
             this.pipeCount++;
-            let isFinish = (this.pipeCount === 9);
+            // ĐÚNG CỘT THỨ 10 SẼ LÀ CỘT VẠCH ĐÍCH CHIẾN THẮNG
+            let isFinish = (this.pipeCount === 10);
 
             this.items.push({ 
                 x: canvas.width, 
@@ -273,10 +274,9 @@ const pipes = {
     reset() { this.items = []; this.pipeCount = 0; }
 };
 
-// --- VẼ GĂNG TAY NẮM ĐẤM TÍM CHUẨN 100% THEO HÌNH MẪU ---
+// --- HÀM VẼ GĂNG TAY TÍM CHO MAP TRUNG BÌNH ---
 function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.save();
-    const p = 3; // Tỷ lệ pixel
     const colBorder = '#281038';
     const colMain   = '#9a50c8';
     const colLight  = '#c088f0';
@@ -284,95 +284,74 @@ function drawPurpleFistGlove(x, y, width, isTop) {
     const colWhite  = '#ffffff';
 
     if (!isTop) {
-        // --- ỐNG DƯỚI: NẮM ĐẤM GIƠ LÊN (UPWARD FIST) ---
         let gx = x - 6;
         let gy = y;
 
-        // 1. Đế cổ tay (Cuff)
         ctx.fillStyle = colMain; ctx.fillRect(gx, gy + 32, width + 12, 12);
         ctx.fillStyle = colLight; ctx.fillRect(gx + 4, gy + 32, 8, 12);
         ctx.fillStyle = colDark; ctx.fillRect(gx + width, gy + 32, 8, 12);
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3; ctx.strokeRect(gx, gy + 32, width + 12, 12);
 
-        // 2. Thân nắm đấm chính (Fist Body)
         ctx.fillStyle = colMain;
         ctx.fillRect(gx - 4, gy + 4, width + 20, 28);
         ctx.fillRect(gx, gy, width + 12, 34);
 
-        // Mảng sáng nổi bật
         ctx.fillStyle = colLight;
         ctx.fillRect(gx - 2, gy + 4, 10, 24);
         ctx.fillStyle = colWhite;
         ctx.fillRect(gx + 8, gy + 6, 4, 20);
 
-        // Đổ bóng tối
         ctx.fillStyle = colDark;
         ctx.fillRect(gx + width + 4, gy + 6, 8, 22);
 
-        // 3. Đường khe phân chia các ngón tay gập lại (Fist Knuckles)
         ctx.fillStyle = colBorder;
         ctx.fillRect(gx + 6, gy + 8, width, 3);
         ctx.fillRect(gx + 6, gy + 18, width, 3);
         
-        // Ngón tay cái gập ngang bên hông
         ctx.fillStyle = colMain; ctx.fillRect(gx - 10, gy + 12, 10, 16);
         ctx.fillStyle = colLight; ctx.fillRect(gx - 8, gy + 14, 4, 12);
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3; ctx.strokeRect(gx - 10, gy + 12, 10, 16);
 
-        // Viền đen tổng thể
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3.5;
         ctx.strokeRect(gx - 4, gy, width + 20, 32);
 
     } else {
-        // --- ỐNG TRÊN: NẮM ĐẤM CHÚI XUỐNG (DOWNWARD FIST) ---
         let gx = x - 6;
         let gy = y - 44;
 
-        // 1. Đế cổ tay (Cuff)
         ctx.fillStyle = colMain; ctx.fillRect(gx, gy, width + 12, 12);
         ctx.fillStyle = colLight; ctx.fillRect(gx + 4, gy, 8, 12);
         ctx.fillStyle = colDark; ctx.fillRect(gx + width, gy, 8, 12);
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3; ctx.strokeRect(gx, gy, width + 12, 12);
 
-        // 2. Thân nắm đấm chính
         ctx.fillStyle = colMain;
         ctx.fillRect(gx - 4, gy + 12, width + 20, 28);
         ctx.fillRect(gx, gy + 10, width + 12, 34);
 
-        // Mảng sáng nổi bật
         ctx.fillStyle = colLight;
         ctx.fillRect(gx - 2, gy + 14, 10, 24);
         ctx.fillStyle = colWhite;
         ctx.fillRect(gx + 8, gy + 16, 4, 20);
 
-        // Đổ bóng tối
         ctx.fillStyle = colDark;
         ctx.fillRect(gx + width + 4, gy + 14, 8, 22);
 
-        // 3. Đường khe phân chia các ngón tay
         ctx.fillStyle = colBorder;
         ctx.fillRect(gx + 6, gy + 20, width, 3);
         ctx.fillRect(gx + 6, gy + 30, width, 3);
 
-        // Ngón tay cái gập ngang
         ctx.fillStyle = colMain; ctx.fillRect(gx - 10, gy + 16, 10, 16);
         ctx.fillStyle = colLight; ctx.fillRect(gx - 8, gy + 18, 4, 12);
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3; ctx.strokeRect(gx - 10, gy + 16, 10, 16);
 
-        // Viền đen tổng thể
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3.5;
         ctx.strokeRect(gx - 4, gy + 12, width + 20, 32);
     }
     ctx.restore();
 }
 
-// --- HỆ THỐNG VẼ CỐNG THEO 3 MAP ---
+// --- HỆ THỐNG VẼ CỐNG KHÔNG BỊ SỌC DỌC ---
 function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
-    const rimHeight = 28;
-    const rimExtraWidth = 6;
-    const rimX = x - rimExtraWidth / 2;
-    const rimW = width + rimExtraWidth;
-
     ctx.save();
 
     if (isFinish) {
@@ -421,7 +400,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
             ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(x - 3, rimY, width + 6, 28);
         }
     } else {
-        // --- 1. MAP DỄ (GIỮA): Ống Xanh lá ---
+        // --- 1. MAP DỄ (XANH LÁ) ---
         if (difficulty === 'EASY') {
             const colDarkBorder = '#232b1a';
             const colMainGreen  = '#75cb27';
@@ -464,7 +443,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, bodyY, width, 4);
             }
         }
-        // --- 2. MAP TRUNG BÌNH (TÍM): ỐNG GĂNG TAY NẮM ĐẤM CHUẨN 100% THEO ẢNH ---[cite: 7]
+        // --- 2. MAP TRUNG BÌNH (TÍM & GĂNG TAY) ---
         else if (difficulty === 'NORMAL') {
             const colDarkBorder = '#281038';
             const colMainPurple = '#9a50c8';
@@ -474,31 +453,26 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
 
             if (isTop) {
                 let bodyH = Math.max(0, height - 44);
-                // Thân ống tím
                 ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
                 ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, 0, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
                 ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
-                // Đầu Găng Tay Nắm Đấm Ống Trên
                 drawPurpleFistGlove(x, bodyH + 44, width, true);
-
             } else {
                 let bodyY = y + 44;
                 let bodyH = Math.max(0, canvas.height - bodyY);
-                // Thân ống tím phía dưới
                 ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
                 ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, bodyY, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
-                ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+                ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-                // Đầu Găng Tay Nắm Đấm Ống Dưới
                 drawPurpleFistGlove(x, y, width, false);
             }
         }
-        // --- 3. MAP KHÓ (ĐỎ): Ống Đỏ hung tức giận ---
+        // --- 3. MAP KHÓ (ĐỎ) ---
         else if (difficulty === 'HARD') {
             const colDarkBorder = '#3a0808';
             const colMainRed    = '#d83838';
