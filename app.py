@@ -249,10 +249,9 @@ const pipes = {
         });
     },
     update() {
-        // Nếu đang trong cảnh cinematic kết thúc thì dừng sinh ống
         if (isCinematicEnding) return;
 
-        let currentSpeed = isBossFight ? this.speed * 0.7 : this.speed; // Làm chậm một chút khi đánh boss cho ngầu
+        let currentSpeed = isBossFight ? this.speed * 0.7 : this.speed;
 
         if (frames % 95 === 0) {
             let maxTop = canvas.height - 80 - this.gap - 50;
@@ -261,14 +260,12 @@ const pipes = {
             
             this.pipeCount++;
             
-            // KÍCH HOẠT BOSS HIỆP SĨ TỪ CỘT 10 TRỞ ĐI
             if (this.pipeCount === 10 && !isBossFight) {
                 isBossFight = true;
                 bossFlashTimer = 60;
                 playSound('boss_alert');
             }
 
-            // CỘT 20 KÍCH HOẠT HIỆU ỨNG SLOW-MOTION NHẶT KIẾM & KẾT LIỄU BOSS
             let isFinish = (this.pipeCount === 20);
 
             this.items.push({ 
@@ -291,7 +288,6 @@ const pipes = {
                 p.passed = true; score++; 
 
                 if (p.isFinish) {
-                    // Kích hoạt Slow-motion & Cảnh nhặt kiếm chém boss
                     triggerCinematicEnding();
                 } else {
                     playSound('score');
@@ -397,7 +393,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.save();
 
     if (isFinish) {
-        // Cột vạch đích caro chiến thắng ở cột 20
         const sq = 8;
         if (isTop) {
             let bodyH = Math.max(0, height - 28);
@@ -533,7 +528,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                // GAI NHỌN TRÊN MÁP KHÓ
                 ctx.fillStyle = '#ffffff';
                 for (let i = 0; i < width; i += 8) {
                     ctx.beginPath();
@@ -559,7 +553,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                // GAI NHỌN DƯỚI MÁP KHÓ
                 ctx.fillStyle = '#ffffff';
                 for (let i = 0; i < width; i += 8) {
                     ctx.beginPath();
@@ -574,74 +567,118 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.restore();
 }
 
-// --- VẼ BOSS HIỆP SĨ ĐỨNG NỀN SAU & HIỆU ỨNG CINEMATIC KẾT LIỆU ---
-function drawBossKnightBackground() {
+// --- VẼ BOSS HIỆP SĨ SẮC NÉT GIỐNG HỆT ẢNH MẪU ---
+function drawDetailedKnightBoss() {
     ctx.save();
-    // Nền trời tối u ám khi đánh boss
-    ctx.fillStyle = '#110d1c'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Nền tối u ám bọc quanh boss
+    ctx.fillStyle = '#161022'; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    let knightX = canvas.width / 2;
-    let knightY = 250 + (isCinematicEnding ? bossDefeatedAnim * 40 : Math.sin(frames * 0.05) * 8);
-    let tiltAngle = isCinematicEnding ? bossDefeatedAnim * 0.4 : 0;
+    let bx = canvas.width / 2;
+    let by = 260 + (isCinematicEnding ? bossDefeatedAnim * 50 : Math.sin(frames * 0.06) * 10);
+    let tilt = isCinematicEnding ? bossDefeatedAnim * 0.5 : 0;
 
     ctx.save();
-    ctx.translate(knightX, knightY);
-    ctx.rotate(tiltAngle);
+    ctx.translate(bx, by);
+    ctx.rotate(tilt);
 
-    // Thân giáp hiệp sĩ hoành tráng ở nền sau
-    ctx.fillStyle = '#4a5058';
+    // 1. ÁO CHOÀNG / NỀN SAU GIÁP
+    ctx.fillStyle = '#282236';
     ctx.beginPath();
-    ctx.roundRect(-110, -90, 220, 200, 24);
+    ctx.roundRect(-125, -110, 250, 220, 20);
     ctx.fill();
-    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 5; ctx.stroke();
 
-    // Giáp vai đồ sộ
-    ctx.fillStyle = '#687484';
+    // 2. GIÁP VAI ĐỒ SỘ (PAULDRONS)
+    const armorBase = '#8a7e6b';
+    const armorHigh = '#d4c5a9';
+    const armorDark = '#4a4235';
+    const goldTrim  = '#d4af37';
+
+    // Vai trái
+    ctx.fillStyle = armorBase;
+    ctx.beginPath(); ctx.roundRect(-165, -125, 75, 100, 22); ctx.fill();
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 4; ctx.stroke();
+    ctx.fillStyle = goldTrim; ctx.fillRect(-155, -115, 55, 12);
+
+    // Vai phải
+    ctx.fillStyle = armorBase;
+    ctx.beginPath(); ctx.roundRect(90, -125, 75, 100, 22); ctx.fill();
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 4; ctx.stroke();
+    ctx.fillStyle = goldTrim; ctx.fillRect(100, -115, 55, 12);
+
+    // 3. THÂN GIÁP CHÍNH (CHESTPLATE)
+    ctx.fillStyle = armorBase;
+    ctx.beginPath(); ctx.roundRect(-100, -95, 200, 180, 16); ctx.fill();
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
+
+    // Hoa văn chữ V / Viền vàng trên giáp ngực
+    ctx.fillStyle = armorDark;
     ctx.beginPath();
-    ctx.roundRect(-150, -110, 65, 90, 16);
-    ctx.roundRect(85, -110, 65, 90, 16);
-    ctx.fill();
-    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 4; ctx.stroke();
+    ctx.moveTo(-70, -70); ctx.lineTo(0, -20); ctx.lineTo(70, -70);
+    ctx.lineTo(70, -50); ctx.lineTo(0, 0); ctx.lineTo(-70, -50);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 3; ctx.stroke();
 
-    // Khiên chắn bên phải
-    ctx.fillStyle = '#8a6840';
+    // 4. KHIÊN LỚN BÊN PHẢI (SHIELD)
+    ctx.fillStyle = '#7a5a38';
+    ctx.beginPath(); ctx.roundRect(115, -60, 50, 140, 24); ctx.fill();
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
+    // Biểu tượng mặt trời/hoa văn trên khiên
+    ctx.fillStyle = goldTrim;
+    ctx.beginPath(); ctx.arc(140, 10, 16, 0, Math.PI * 2); ctx.fill();
+
+    // 5. THANH KIẾM KHỔNG LỒ NGANG TRƯỚC NGỰC BOSS
+    ctx.fillStyle = '#a08850'; // Chuôi kiếm
+    ctx.fillRect(-140, -15, 45, 14);
+    ctx.fillStyle = goldTrim; // Hốc đá quý trên chuôi
+    ctx.beginPath(); ctx.arc(-115, -8, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ff2200';
+    ctx.beginPath(); ctx.arc(-115, -8, 3, 0, Math.PI * 2); ctx.fill();
+    
+    ctx.fillStyle = '#4a3820'; // Chắn kiếm (Guard)
+    ctx.fillRect(-95, -24, 18, 32);
+
+    ctx.fillStyle = '#e0e8f0'; // Lưỡi kiếm sáng lấp lánh vắt ngang
     ctx.beginPath();
-    ctx.roundRect(110, -50, 45, 120, 20);
+    ctx.moveTo(-77, -12); ctx.lineTo(130, -12); ctx.lineTo(130, -6); ctx.lineTo(-77, -6);
     ctx.fill();
-    ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 4; ctx.stroke();
+    ctx.strokeStyle = '#8898a8'; ctx.lineWidth = 2; ctx.stroke();
 
-    // Mũ giáp sắt & khe mắt phát sáng
-    ctx.fillStyle = '#3a4048';
-    ctx.beginPath();
-    ctx.roundRect(-55, -150, 110, 100, 40);
-    ctx.fill();
-    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 4; ctx.stroke();
+    // 6. MŨ GIÁP SẮT (HELMET) & KHE MẮT NGẦU LÒI
+    ctx.fillStyle = armorBase;
+    ctx.beginPath(); ctx.roundRect(-65, -165, 130, 110, 44); ctx.fill();
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
 
-    // Khe mắt đáng sợ
-    ctx.fillStyle = '#ff3300';
-    ctx.fillRect(-28, -110, 20, 8);
-    ctx.fillRect(8, -110, 20, 8);
+    // Viền trung tâm mũ giáp
+    ctx.fillStyle = armorDark;
+    ctx.fillRect(-12, -165, 24, 110);
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 2; ctx.strokeRect(-12, -165, 24, 110);
+
+    // Khe mắt phát sáng hung dữ
+    ctx.fillStyle = '#ff1100';
+    ctx.fillRect(-35, -125, 22, 10);
+    ctx.fillRect(13, -125, 22, 10);
     ctx.fillStyle = '#ffff00';
-    ctx.fillRect(-22, -108, 8, 4);
-    ctx.fillRect(14, -108, 8, 4);
+    ctx.fillRect(-28, -122, 10, 4);
+    ctx.fillRect(20, -122, 10, 4);
 
-    // Miệng lưới giáp
+    // Miệng khe thông gió mặt nạ (Grille)
     ctx.fillStyle = '#222830';
-    ctx.fillRect(-20, -85, 40, 30);
-    ctx.strokeStyle = '#b0c4de'; ctx.lineWidth = 2;
-    for(let i = -12; i <= 12; i += 8) {
-        ctx.beginPath(); ctx.moveTo(i, -85); ctx.lineTo(i, -55); ctx.stroke();
+    ctx.fillRect(-22, -95, 44, 32);
+    ctx.strokeStyle = goldTrim; ctx.lineWidth = 2; ctx.strokeRect(-22, -95, 44, 32);
+    ctx.fillStyle = goldTrim;
+    for(let i = -14; i <= 14; i += 10) {
+        ctx.fillRect(i, -87, 4, 16);
     }
 
     ctx.restore();
 
-    // Thanh kiếm cắm ở cột đích khi ở màn hình Cinematic
+    // Thanh kiếm cắm ở cột đích khi ở cảnh Cinematic kết liễu
     if (isCinematicEnding) {
         ctx.save();
-        ctx.fillStyle = '#d4af37'; // Cán kiếm vàng
+        ctx.fillStyle = '#d4af37';
         ctx.fillRect(canvas.width / 2 - 6, 330, 12, 30);
-        ctx.fillStyle = '#c0c0c0'; // Lưỡi kiếm sáng lấp lánh
-        ctx.fillRect(canvas.width / 2 - 4, 270, 8, 65);
+        ctx.fillStyle = '#e0e8f0';
+        ctx.fillRect(canvas.width / 2 - 4, 260, 8, 75);
         ctx.restore();
     }
 
@@ -650,10 +687,9 @@ function drawBossKnightBackground() {
 
 function drawBackgroundCity() {
     if (isBossFight || isCinematicEnding) {
-        drawBossKnightBackground();
+        drawDetailedKnightBoss();
 
         if (isBossFight && !isCinematicEnding) {
-            // Thanh máu Boss phía trên
             ctx.fillStyle = '#ff0000';
             ctx.fillRect(100, 20, 280, 16);
             ctx.fillStyle = '#ffff00';
@@ -661,8 +697,8 @@ function drawBackgroundCity() {
             ctx.fillRect(100, 20, bossHpWidth, 16);
             ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(100, 20, 280, 16);
 
-            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px "Courier New"'; ctx.textAlign = 'center';
-            ctx.fillText('⚡ BOSS HỆP SĨ: CỘT ' + pipes.pipeCount + '/20 ⚡', canvas.width / 2, 52);
+            ctx.fillStyle = '#ffffff'; ctx.font = 'bold 13px "Courier New"'; ctx.textAlign = 'center';
+            ctx.fillText('⚡ BOSS HIỆP SĨ: CỘT ' + pipes.pipeCount + '/20 ⚡', canvas.width / 2, 52);
         }
 
         if (bossFlashTimer > 0) {
@@ -705,7 +741,7 @@ function drawGround() {
     let grassTop = '#9bd843';
 
     if (isBossFight || isCinematicEnding) {
-        groundCol = '#22182c'; grassCol = '#5a3888'; grassTop = '#8858c8';
+        groundCol = '#1a1424'; grassCol = '#4a3070'; grassTop = '#7850a8';
     } else if (currentDifficulty === 'NORMAL') {
         groundCol = '#c098d8'; grassCol = '#9a50c8'; grassTop = '#b878e8';
     } else if (currentDifficulty === 'HARD') {
@@ -1041,19 +1077,17 @@ function triggerCinematicEnding() {
 }
 
 function loop() {
-    // Xử lý hiệu ứng Slow-motion & hoạt ảnh nhặt kiếm chém boss gục xuống
     if (isCinematicEnding) {
         cinematicTimer++;
-        bossDefeatedAnim = Math.min(1.0, bossDefeatedAnim + 0.015); // Tốc độ slowmo gục xuống từ từ
+        bossDefeatedAnim = Math.min(1.0, bossDefeatedAnim + 0.015);
 
-        // Chim bay tự động nhẹ nhàng đến giữa màn hình để nhặt kiếm
         if (bird.x < canvas.width / 2) {
             bird.x += 0.8;
         }
         bird.y += (canvas.height / 2 - bird.y) * 0.05;
         bird.velocity = 0;
 
-        if (cinematicTimer > 180) { // Sau khi hoàn tất cảnh slow-motion
+        if (cinematicTimer > 180) {
             triggerWin();
         }
     } else if (gameState === 'PLAYING') {
@@ -1163,7 +1197,7 @@ function handleInteraction(clientX, clientY) {
     }
 }
 
-function startGame() {
+functionstartGame() {
     bird.reset(); 
     pipes.reset(); 
     score = 0; 
