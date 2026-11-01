@@ -542,7 +542,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 let bodyH = Math.max(0, canvas.height - bodyY);
                 let rX = x - 3, rW = width + 6;
                 ctx.fillStyle = colMainRed; ctx.fillRect(x, bodyY, width, bodyH);
-                ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, bodyY, 10, bodyH);
+                ctx.fillStyle = colLightRed; ctx.fillRect(rX + 4, bodyY, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
                 ctx.fillStyle = colDarkRed; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
@@ -567,10 +567,9 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
     ctx.restore();
 }
 
-// --- VẼ BOSS HIỆP SĨ SẮC NÉT (ĐÃ BỎ CÁC VỆT MÀU DƯ THỪA) ---
+// --- VẼ BOSS HIỆP SĨ SẮC NÉT ---
 function drawDetailedKnightBoss() {
     ctx.save();
-    // Nền tối thuần khiết, sạch sẽ
     ctx.fillStyle = '#0d0814'; ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let bx = canvas.width / 2;
@@ -581,30 +580,25 @@ function drawDetailedKnightBoss() {
     ctx.translate(bx, by);
     ctx.rotate(tilt);
 
-    // 1. TẤM LƯNG / ÁO CHOÀNG PHÍA SAU
     ctx.fillStyle = '#1e1929';
     ctx.beginPath();
     ctx.roundRect(-125, -110, 250, 220, 20);
     ctx.fill();
 
-    // 2. GIÁP VAI ĐỒ SỘ (PAULDRONS)
     const armorBase = '#8a7e6b';
     const goldTrim  = '#d4af37';
     const armorDark = '#4a4235';
 
-    // Vai trái
     ctx.fillStyle = armorBase;
     ctx.beginPath(); ctx.roundRect(-165, -125, 75, 100, 22); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 4; ctx.stroke();
     ctx.fillStyle = goldTrim; ctx.fillRect(-155, -115, 55, 12);
 
-    // Vai phải
     ctx.fillStyle = armorBase;
     ctx.beginPath(); ctx.roundRect(90, -125, 75, 100, 22); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 4; ctx.stroke();
     ctx.fillStyle = goldTrim; ctx.fillRect(100, -115, 55, 12);
 
-    // 3. THÂN GIÁP CHÍNH (CHESTPLATE)
     ctx.fillStyle = armorBase;
     ctx.beginPath(); ctx.roundRect(-100, -95, 200, 180, 16); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
@@ -616,14 +610,12 @@ function drawDetailedKnightBoss() {
     ctx.closePath(); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 3; ctx.stroke();
 
-    // 4. KHIÊN LỚN BÊN PHẢI (SHIELD)
     ctx.fillStyle = '#7a5a38';
     ctx.beginPath(); ctx.roundRect(115, -60, 50, 140, 24); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
     ctx.fillStyle = goldTrim;
     ctx.beginPath(); ctx.arc(140, 10, 16, 0, Math.PI * 2); ctx.fill();
 
-    // 5. THANH KIẾM KHỔNG LỒ NGANG TRƯỚC NGỰC BOSS
     ctx.fillStyle = '#a08850';
     ctx.fillRect(-140, -15, 45, 14);
     ctx.fillStyle = goldTrim;
@@ -640,7 +632,6 @@ function drawDetailedKnightBoss() {
     ctx.fill();
     ctx.strokeStyle = '#8898a8'; ctx.lineWidth = 2; ctx.stroke();
 
-    // 6. MŨ GIÁP SẮT (HELMET) & KHE MẮT NGẦU LÒI
     ctx.fillStyle = armorBase;
     ctx.beginPath(); ctx.roundRect(-65, -165, 130, 110, 44); ctx.fill();
     ctx.strokeStyle = goldTrim; ctx.lineWidth = 5; ctx.stroke();
@@ -713,11 +704,8 @@ function drawBackgroundCity() {
         ctx.fill();
     } 
     else if (currentDifficulty === 'NORMAL') {
+        // Đã loại bỏ hoàn toàn các khối/vệt màu tím dư thừa ở nền, giờ chỉ còn nền trời hồng/tím nhạt sạch sẽ
         ctx.fillStyle = '#e8b0d8'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#d898c8';
-        ctx.fillRect(40, 440, 70, 120);
-        ctx.fillRect(160, 410, 80, 150);
-        ctx.fillRect(300, 450, 90, 110);
     } 
     else if (currentDifficulty === 'HARD') {
         ctx.fillStyle = '#e87878'; ctx.fillRect(0, 0, canvas.width, canvas.height);
