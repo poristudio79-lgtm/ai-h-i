@@ -77,13 +77,12 @@ function playSound(type) {
 }
 
 // --- TRẠNG THÁI GAME ---
-let gameState = 'START'; // START, CHARACTERS, PLAYING, GAMEOVER
+let gameState = 'START';
 let score = 0;
 let highScore = localStorage.getItem('fb_highscore') || 0;
 let frames = 0;
-let selectedSkin = 1; // Mặc định là OHINH (Vàng gốc)
+let selectedSkin = 1;
 
-// 6 NHÂN VẬT THEO HÌNH MẪU
 const CHARACTERS = [
     { id: 0, name: 'GBI', color: '#e82878' },
     { id: 1, name: 'OHINH', color: '#f8d038' },
@@ -93,13 +92,13 @@ const CHARACTERS = [
     { id: 5, name: 'NARWHAL', color: '#20b2aa' }
 ];
 
-// --- HÀM VẼ CÁC NHÂN VẬT PIXEL ---
+// --- HÀM VẼ NHÂN VẬT ---
 function drawPixelBird(x, y, skinId, scale = 2) {
     ctx.save();
     ctx.translate(x, y);
     const p = scale;
 
-    if (skinId === 0) { // 1. GBI
+    if (skinId === 0) {
         ctx.fillStyle = '#4a403a'; ctx.fillRect(-8*p, -7*p, 16*p, 13*p);
         ctx.fillStyle = '#f8ea38'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#e82878'; ctx.fillRect(-7*p, -7*p, 14*p, 3*p);
@@ -109,7 +108,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#e82878'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, 0*p, 4*p, 3*p);
     } 
-    else if (skinId === 1) { // 2. OHINH (Vàng gốc)
+    else if (skinId === 1) {
         ctx.fillStyle = '#4a403a'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#f8d038'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f8b000'; ctx.fillRect(-6*p, 2*p, 10*p, 2*p);
@@ -118,7 +117,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#f85820'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     } 
-    else if (skinId === 2) { // 3. HOI BINK
+    else if (skinId === 2) {
         ctx.fillStyle = '#303030'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#509848'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#78c038'; ctx.fillRect(-5*p, -10*p, 10*p, 4*p); ctx.fillRect(-7*p, -7*p, 14*p, 2*p);
@@ -127,7 +126,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#f87820'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 3) { // 4. KHON
+    else if (skinId === 3) {
         ctx.fillStyle = '#302040'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#8838d0'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#f858a8'; ctx.fillRect(-6*p, -10*p, 11*p, 4*p);
@@ -137,7 +136,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#f89020'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#f878c0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 4) { // 5. BINH
+    else if (skinId === 4) {
         ctx.fillStyle = '#203840'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
         ctx.fillStyle = '#38a8b8'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
         ctx.fillStyle = '#c048d0'; ctx.fillRect(3*p, -11*p, 3*p, 5*p);
@@ -147,7 +146,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
         ctx.fillStyle = '#306870'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
         ctx.fillStyle = '#78e0f0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
     }
-    else if (skinId === 5) { // 6. NARWHAL
+    else if (skinId === 5) {
         ctx.fillStyle = '#103038'; ctx.fillRect(-10*p, -4*p, 20*p, 10*p);
         ctx.fillStyle = '#20b2aa'; ctx.fillRect(-9*p, -3*p, 18*p, 8*p);
         ctx.fillStyle = '#e0f8f8'; ctx.fillRect(-9*p, 1*p, 18*p, 4*p);
@@ -160,7 +159,7 @@ function drawPixelBird(x, y, skinId, scale = 2) {
     ctx.restore();
 }
 
-// --- ĐỐI TƯỢNG CHIM ---
+// --- CHIM ---
 const bird = {
     x: 80, y: 250, radius: 12, gravity: 0.25, jumpForce: -4.6, velocity: 0,
     draw() {
@@ -185,7 +184,7 @@ const bird = {
     reset() { this.y = 250; this.velocity = 0; }
 };
 
-// --- HÀM VẼ ĐƯỜNG ỐNG CỐNG RETRO PIXEL ART CHUẨN ---
+// --- HÀM VẼ ĐƯỜNG ỐNG CỐNG PIXEL ART ---
 function drawSinglePipe(x, y, width, height, isTop) {
     const rimHeight = 28;
     const rimExtraWidth = 6;
@@ -201,12 +200,10 @@ function drawSinglePipe(x, y, width, height, isTop) {
     ctx.save();
 
     if (isTop) {
-        // Ống Trên
         let bodyH = Math.max(0, height - rimHeight);
 
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(x, 0, width, bodyH);
-
         ctx.fillStyle = colLightGreen;
         ctx.fillRect(x + 4, 0, 10, bodyH);
         ctx.fillStyle = colWhiteLine;
@@ -221,7 +218,6 @@ function drawSinglePipe(x, y, width, height, isTop) {
         let rimY = bodyH;
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(rimX, rimY, rimW, rimHeight);
-
         ctx.fillStyle = colLightGreen;
         ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
         ctx.fillStyle = colWhiteLine;
@@ -237,14 +233,12 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillRect(x, rimY + rimHeight, width, 4);
 
     } else {
-        // Ống Dưới - Kéo dài xuống tận đáy màn hình để không bị lợt mặt đất
         let rimY = y;
         let bodyY = y + rimHeight;
         let bodyH = Math.max(0, canvas.height - bodyY);
 
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(x, bodyY, width, bodyH);
-
         ctx.fillStyle = colLightGreen;
         ctx.fillRect(x + 4, bodyY, 10, bodyH);
         ctx.fillStyle = colWhiteLine;
@@ -258,7 +252,6 @@ function drawSinglePipe(x, y, width, height, isTop) {
 
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(rimX, rimY, rimW, rimHeight);
-
         ctx.fillStyle = colLightGreen;
         ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
         ctx.fillStyle = colWhiteLine;
@@ -311,8 +304,9 @@ const pipes = {
     reset() { this.items = []; }
 };
 
-// --- MẶT ĐẤT VÀ NỀN THÀNH PHỐ ---
+// --- TÁCH HÀM VẼ NỀN THÀNH PHỐ VÀ MẶT ĐẤT ---
 function drawBackgroundCity() {
+    // 1. Núi/mây xa
     ctx.fillStyle = '#a1e4c3';
     ctx.beginPath();
     ctx.arc(60, 520, 70, 0, Math.PI * 2);
@@ -321,6 +315,7 @@ function drawBackgroundCity() {
     ctx.arc(440, 530, 75, 0, Math.PI * 2);
     ctx.fill();
 
+    // 2. Tòa nhà chọc trời ở NỀN ĐẰNG SAU
     ctx.fillStyle = '#83d8b4';
     ctx.fillRect(20, 480, 40, 80);
     ctx.fillRect(80, 450, 50, 110);
@@ -331,8 +326,7 @@ function drawBackgroundCity() {
 }
 
 function drawGround() {
-    drawBackgroundCity();
-
+    // Chỉ vẽ phần mặt đất bên dưới đáy
     ctx.fillStyle = '#ded895'; ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
     ctx.strokeStyle = '#232b1a'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(0, canvas.height - 80); ctx.lineTo(canvas.width, canvas.height - 80); ctx.stroke();
@@ -341,7 +335,7 @@ function drawGround() {
     ctx.fillStyle = '#549c1b'; ctx.fillRect(0, canvas.height - 68, canvas.width, 4);
 }
 
-// --- BẢNG CHỌN NHÂN VẬT ---
+// --- MENU CHỌN NHÂN VẬT ---
 function drawCharacterMenu() {
     let panelX = 30, panelY = 40, panelW = 420, panelH = 550;
     
@@ -451,7 +445,6 @@ function drawStar(cx, cy, color) {
     ctx.restore();
 }
 
-// --- UI CHÍNH / GAME OVER ---
 function drawUI() {
     if (gameState === 'START' || gameState === 'CHARACTERS') {
         drawCharacterMenu();
@@ -484,22 +477,25 @@ function triggerGameOver() {
     if (gameState !== 'GAMEOVER') { playSound('hit'); gameState = 'GAMEOVER'; }
 }
 
-// --- VÒNG LẶP CHÍNH (ĐÃ SỬA THỨ TỰ VẼ MẶT ĐẤT & ỐNG CỐNG) ---
+// --- VÒNG LẶP CHÍNH CHUẨN LỚP ĐỒ HỌA ---
 function loop() {
-    // 1. Vẽ nền trời
+    // 1. Vẽ bầu trời
     ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. Vẽ thành phố ở NỀN ĐẰNG SAU CÙNG
+    drawBackgroundCity();
 
     if (gameState === 'PLAYING') {
         bird.update(); pipes.update(); frames++;
     }
 
-    // 2. Vẽ ống cống trước (nằm đằng sau mặt đất)
+    // 3. Vẽ ỐNG CỐNG NỔI TRÊN THÀNH PHỐ
     pipes.draw(); 
 
-    // 3. Vẽ mặt đất che lên chân ống cống
+    // 4. Vẽ MẶT ĐẤT CHÈN NÔNG TRÊN CHÂN ỐNG CỐNG
     drawGround();
 
-    // 4. Vẽ chú chim và giao diện UI
+    // 5. Vẽ Chim và Giao diện UI
     if (gameState === 'PLAYING') bird.draw();
     drawUI();
 
