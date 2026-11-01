@@ -86,13 +86,13 @@ function playSound(type) {
 }
 
 // --- TRẠNG THÁI GAME ---
-let gameState = 'START'; // START, DIFFICULTY, CHARACTERS, PLAYING, GAMEOVER, WIN
+let gameState = 'START';
 let score = 0;
 let highScore = localStorage.getItem('fb_highscore') || 0;
 let isNewHighScore = false;
 let frames = 0;
 let selectedSkin = 1;
-let currentDifficulty = 'EASY'; // EASY (giữa), NORMAL (tím), HARD (đỏ)
+let currentDifficulty = 'EASY';
 
 const CHARACTERS = [
     { id: 0, name: 'GBI', color: '#e82878' },
@@ -106,9 +106,9 @@ const CHARACTERS = [
 const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
 const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
 
-const diffEasyBtn = { x: 100, y: 220, w: 280, h: 65 };   // Dễ (Giữa)
-const diffNormalBtn = { x: 100, y: 305, w: 280, h: 65 }; // Trung bình (Tím)
-const diffHardBtn = { x: 100, y: 390, w: 280, h: 65 };   // Khó (Đỏ)
+const diffEasyBtn = { x: 100, y: 220, w: 280, h: 65 };   
+const diffNormalBtn = { x: 100, y: 305, w: 280, h: 65 }; 
+const diffHardBtn = { x: 100, y: 390, w: 280, h: 65 };   
 const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
@@ -208,13 +208,13 @@ const pipes = {
     
     setDifficulty(diff) {
         currentDifficulty = diff;
-        if (diff === 'EASY') { // Map Giữa (Xanh)
+        if (diff === 'EASY') {
             this.gap = 145;
             this.speed = 1.9;
-        } else if (diff === 'NORMAL') { // Map Trung Bình (Tím)[cite: 6]
+        } else if (diff === 'NORMAL') {
             this.gap = 130;
             this.speed = 2.3;
-        } else if (diff === 'HARD') { // Map Khó (Đỏ)[cite: 6]
+        } else if (diff === 'HARD') {
             this.gap = 105;
             this.speed = 2.9;
         }
@@ -273,20 +273,20 @@ const pipes = {
     reset() { this.items = []; this.pipeCount = 0; }
 };
 
-// --- HỆ THỐNG VẼ CỐNG THEO 3 MAP (DỄ / TRUNG BÌNH / KHÓ) ---
+// --- HỆ THỐNG VẼ CỐNG THEO 3 MAP ---
 function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
-    const rimHeight = 28;
-    const rimExtraWidth = 6;
+    const rimHeight = 36;
+    const rimExtraWidth = 12;
     const rimX = x - rimExtraWidth / 2;
     const rimW = width + rimExtraWidth;
 
     ctx.save();
 
     if (isFinish) {
-        // Cột vạch đích caro đen trắng chung cho cả 3 map
+        // Cột vạch đích caro đen trắng
         const sq = 8;
         if (isTop) {
-            let bodyH = Math.max(0, height - rimHeight);
+            let bodyH = Math.max(0, height - 28);
             for (let bx = 0; bx < width; bx += sq) {
                 for (let by = 0; by < bodyH; by += sq) {
                     let isBlack = (Math.floor(bx / sq) + Math.floor(by / sq)) % 2 === 0;
@@ -297,17 +297,17 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
             ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
             let rimY = bodyH;
-            for (let rx = 0; rx < rimW; rx += sq) {
-                for (let ry = 0; ry < rimHeight; ry += sq) {
+            for (let rx = 0; rx < width + 6; rx += sq) {
+                for (let ry = 0; ry < 28; ry += sq) {
                     let isBlack = (Math.floor(rx / sq) + Math.floor(ry / sq)) % 2 === 0;
                     ctx.fillStyle = isBlack ? '#1a1a1a' : '#ffffff';
-                    ctx.fillRect(rimX + rx, rimY + ry, sq, sq);
+                    ctx.fillRect(x - 3 + rx, rimY + ry, sq, sq);
                 }
             }
-            ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+            ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(x - 3, rimY, width + 6, 28);
         } else {
             let rimY = y;
-            let bodyY = y + rimHeight;
+            let bodyY = y + 28;
             let bodyH = Math.max(0, canvas.height - bodyY);
             for (let bx = 0; bx < width; bx += sq) {
                 for (let by = 0; by < bodyH; by += sq) {
@@ -318,14 +318,14 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
             }
             ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-            for (let rx = 0; rx < rimW; rx += sq) {
-                for (let ry = 0; ry < rimHeight; ry += sq) {
+            for (let rx = 0; rx < width + 6; rx += sq) {
+                for (let ry = 0; ry < 28; ry += sq) {
                     let isBlack = (Math.floor(rx / sq) + Math.floor(ry / sq)) % 2 === 0;
                     ctx.fillStyle = isBlack ? '#1a1a1a' : '#ffffff';
-                    ctx.fillRect(rimX + rx, rimY + ry, sq, sq);
+                    ctx.fillRect(x - 3 + rx, rimY + ry, sq, sq);
                 }
             }
-            ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+            ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.strokeRect(x - 3, rimY, width + 6, 28);
         }
     } else {
         // --- 1. MAP DỄ (GIỮA): Ống Xanh lá ---
@@ -337,7 +337,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
             const colDarkGreen  = '#549c1b';
 
             if (isTop) {
-                let bodyH = Math.max(0, height - rimHeight);
+                let bodyH = Math.max(0, height - 28);
                 ctx.fillStyle = colMainGreen; ctx.fillRect(x, 0, width, bodyH);
                 ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, 0, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
@@ -345,85 +345,114 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
                 let rimY = bodyH;
-                ctx.fillStyle = colMainGreen; ctx.fillRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = colLightGreen; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-                ctx.fillStyle = colDarkGreen; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, rimY + rimHeight, width, 4);
+                let rX = x - 3, rW = width + 6;
+                ctx.fillStyle = colMainGreen; ctx.fillRect(rX, rimY, rW, 28);
+                ctx.fillStyle = colLightGreen; ctx.fillRect(rX + 5, rimY, 12, 28);
+                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+                ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
+                ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, rimY + 28, width, 4);
             } else {
                 let rimY = y;
-                let bodyY = y + rimHeight;
+                let bodyY = y + 28;
                 let bodyH = Math.max(0, canvas.height - bodyY);
+                let rX = x - 3, rW = width + 6;
                 ctx.fillStyle = colMainGreen; ctx.fillRect(x, bodyY, width, bodyH);
                 ctx.fillStyle = colLightGreen; ctx.fillRect(x + 4, bodyY, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
                 ctx.fillStyle = colDarkGreen; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-                ctx.fillStyle = colMainGreen; ctx.fillRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = colLightGreen; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-                ctx.fillStyle = colDarkGreen; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+                ctx.fillStyle = colMainGreen; ctx.fillRect(rX, rimY, rW, 28);
+                ctx.fillStyle = colLightGreen; ctx.fillRect(rX + 5, rimY, 12, 28);
+                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+                ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
                 ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x, bodyY, width, 4);
             }
         }
-        // --- 2. MAP TRUNG BÌNH (TÍM): Ống Tím sang trọng giống hình mẫu ---[cite: 6]
+        // --- 2. MAP TRUNG BÌNH (TÍM): ỐNG HÌNH GĂNG TAY ĐẤM BOX (BOXING GLOVES) ---[cite: 6]
         else if (difficulty === 'NORMAL') {
             const colDarkBorder = '#281038';
             const colMainPurple = '#9a50c8';
             const colLightPurple= '#c088f0';
             const colWhiteLine  = '#ffffff';
             const colDarkPurple = '#682898';
+            const colWristCuff  = '#e0d0f0';
 
             if (isTop) {
                 let bodyH = Math.max(0, height - rimHeight);
+                // Thân ống tím
                 ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
                 ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, 0, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
                 ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
-                let rimY = bodyH;
-                ctx.fillStyle = colMainPurple; ctx.fillRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = colLightPurple; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-                ctx.fillStyle = colDarkPurple; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
-                
-                // Vẽ tai nắm / họa tiết gang tay trang trí hai bên nắp ống tím giống hình mẫu[cite: 6]
-                ctx.fillStyle = colDarkPurple;
-                ctx.fillRect(rimX - 6, rimY + 8, 6, 12);
-                ctx.fillRect(rimX + rimW, rimY + 8, 6, 12);
+                // Đầu găng tay đấm box (Quay ngửa hướng xuống)
+                let gY = bodyH;
+                ctx.fillStyle = colMainPurple;
+                ctx.beginPath();
+                ctx.roundRect(rimX, gY, rimW, rimHeight, 16);
+                ctx.fill();
+                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.stroke();
+
+                // Ngón tay cái chĩa ra bên hông găng tay
+                ctx.fillStyle = colMainPurple;
+                ctx.beginPath();
+                ctx.arc(rimX - 4, gY + 18, 10, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                // Vệt sáng bóng trên găng tay
+                ctx.fillStyle = colLightPurple;
+                ctx.fillRect(rimX + 8, gY + 6, 12, 20);
+                ctx.fillStyle = colWhiteLine;
+                ctx.fillRect(rimX + 22, gY + 6, 4, 20);
+
+                // Đường viền cổ tay găng boxing (Cuff)
+                ctx.fillStyle = colWristCuff;
+                ctx.fillRect(rimX + 2, gY, rimW - 4, 7);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 2;
-                ctx.strokeRect(rimX - 6, rimY + 8, 6, 12);
-                ctx.strokeRect(rimX + rimW, rimY + 8, 6, 12);
+                ctx.strokeRect(rimX + 2, gY, rimW - 4, 7);
             } else {
-                let rimY = y;
+                let gY = y;
                 let bodyY = y + rimHeight;
                 let bodyH = Math.max(0, canvas.height - bodyY);
+                
+                // Thân ống tím phía dưới
                 ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
                 ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, bodyY, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
                 ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-                ctx.fillStyle = colMainPurple; ctx.fillRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = colLightPurple; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-                ctx.fillStyle = colDarkPurple; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+                // Đầu găng tay đấm box (Quay úp hướng lên)
+                ctx.fillStyle = colMainPurple;
+                ctx.beginPath();
+                ctx.roundRect(rimX, gY, rimW, rimHeight, 16);
+                ctx.fill();
+                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.stroke();
 
-                ctx.fillStyle = colDarkPurple;
-                ctx.fillRect(rimX - 6, rimY + 8, 6, 12);
-                ctx.fillRect(rimX + rimW, rimY + 8, 6, 12);
+                // Ngón cái chĩa ra hông
+                ctx.fillStyle = colMainPurple;
+                ctx.beginPath();
+                ctx.arc(rimX - 4, gY + 18, 10, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                // Vệt sáng bóng găng tay
+                ctx.fillStyle = colLightPurple;
+                ctx.fillRect(rimX + 8, gY + 8, 12, 20);
+                ctx.fillStyle = colWhiteLine;
+                ctx.fillRect(rimX + 22, gY + 8, 4, 20);
+
+                // Đường viền cổ tay găng boxing phía dưới
+                ctx.fillStyle = colWristCuff;
+                ctx.fillRect(rimX + 2, gY + rimHeight - 7, rimW - 4, 7);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 2;
-                ctx.strokeRect(rimX - 6, rimY + 8, 6, 12);
-                ctx.strokeRect(rimX + rimW, rimY + 8, 6, 12);
+                ctx.strokeRect(rimX + 2, gY + rimHeight - 7, rimW - 4, 7);
             }
         }
-        // --- 3. MAP KHÓ (ĐỎ): Ống Đỏ hung tức giận có răng cưa giống hình mẫu ---[cite: 6]
+        // --- 3. MAP KHÓ (ĐỎ): Ống Đỏ hung tức giận ---[cite: 6]
         else if (difficulty === 'HARD') {
             const colDarkBorder = '#3a0808';
             const colMainRed    = '#d83838';
@@ -432,7 +461,7 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
             const colDarkRed    = '#981818';
 
             if (isTop) {
-                let bodyH = Math.max(0, height - rimHeight);
+                let bodyH = Math.max(0, height - 28);
                 ctx.fillStyle = colMainRed; ctx.fillRect(x, 0, width, bodyH);
                 ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, 0, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
@@ -440,50 +469,49 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
                 let rimY = bodyH;
-                ctx.fillStyle = colMainRed; ctx.fillRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = colLightRed; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-                ctx.fillStyle = colDarkRed; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+                let rX = x - 3, rW = width + 6;
+                ctx.fillStyle = colMainRed; ctx.fillRect(rX, rimY, rW, 28);
+                ctx.fillStyle = colLightRed; ctx.fillRect(rX + 5, rimY, 12, 28);
+                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+                ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                // Vẽ khuôn mặt tức giận và hàng răng cưa độc đáo của ống Đỏ[cite: 6]
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(x + 10, rimY - 22, 12, 10);
                 ctx.fillRect(x + 34, rimY - 22, 12, 10);
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(x + 16, rimY - 18, 4, 4);
                 ctx.fillRect(x + 40, rimY - 18, 4, 4);
-                // Lông mày cau có
+
                 ctx.fillStyle = '#3a0808';
                 ctx.fillRect(x + 8, rimY - 26, 16, 4);
                 ctx.fillRect(x + 32, rimY - 26, 16, 4);
 
-                // Răng cưa phía dưới nắp ống
                 ctx.fillStyle = '#ffffff';
                 for (let i = 0; i < width; i += 8) {
                     ctx.beginPath();
-                    ctx.moveTo(x + i, rimY + rimHeight);
-                    ctx.lineTo(x + i + 4, rimY + rimHeight + 6);
-                    ctx.lineTo(x + i + 8, rimY + rimHeight);
+                    ctx.moveTo(x + i, rimY + 28);
+                    ctx.lineTo(x + i + 4, rimY + 34);
+                    ctx.lineTo(x + i + 8, rimY + 28);
                     ctx.fill();
                 }
             } else {
                 let rimY = y;
-                let bodyY = y + rimHeight;
+                let bodyY = y + 28;
                 let bodyH = Math.max(0, canvas.height - bodyY);
+                let rX = x - 3, rW = width + 6;
                 ctx.fillStyle = colMainRed; ctx.fillRect(x, bodyY, width, bodyH);
                 ctx.fillStyle = colLightRed; ctx.fillRect(x + 4, bodyY, 10, bodyH);
                 ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
                 ctx.fillStyle = colDarkRed; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
                 ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
-                ctx.fillStyle = colMainRed; ctx.fillRect(rimX, rimY, rimW, rimHeight);
-                ctx.fillStyle = colLightRed; ctx.fillRect(rimX + 5, rimY, 12, rimHeight);
-                ctx.fillStyle = colWhiteLine; ctx.fillRect(rimX + 17, rimY, 4, rimHeight);
-                ctx.fillStyle = colDarkRed; ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
-                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rimX, rimY, rimW, rimHeight);
+                ctx.fillStyle = colMainRed; ctx.fillRect(rX, rimY, rW, 28);
+                ctx.fillStyle = colLightRed; ctx.fillRect(rX + 5, rimY, 12, 28);
+                ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
+                ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
+                ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-                // Răng cưa ở miệng ống phía dưới
                 ctx.fillStyle = '#ffffff';
                 for (let i = 0; i < width; i += 8) {
                     ctx.beginPath();
@@ -501,7 +529,6 @@ function drawPipesByTheme(x, y, width, height, isTop, isFinish, difficulty) {
 // --- VẼ BACKGROUND THEO TỪNG MAP ---
 function drawBackgroundCity() {
     if (currentDifficulty === 'EASY') {
-        // Map Dễ: Trời xanh mây trắng
         ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#a1e4c3';
         ctx.beginPath();
@@ -520,7 +547,6 @@ function drawBackgroundCity() {
         ctx.fillRect(370, 470, 55, 90);
     } 
     else if (currentDifficulty === 'NORMAL') {
-        // Map Trung Bình: Trời hồng tím lãng mạn[cite: 6]
         ctx.fillStyle = '#e8b0d8'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#d898c8';
         ctx.fillRect(40, 440, 70, 120);
@@ -528,7 +554,6 @@ function drawBackgroundCity() {
         ctx.fillRect(300, 450, 90, 110);
     } 
     else if (currentDifficulty === 'HARD') {
-        // Map Khó: Trời đỏ rực rỡ bùng nổ[cite: 6]
         ctx.fillStyle = '#e87878'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#c85050';
         ctx.fillRect(50, 460, 60, 100);
@@ -598,7 +623,6 @@ function drawMainMenu() {
     drawMenuButton(menuCharBtn, false);
 }
 
-// --- MÀN HÌNH CHỌN ĐỘ KHÓ (CHÍNH XÁC THEO HÌNH MẪU) ---
 function drawDifficultyMenu() {
     let titleX = canvas.width / 2;
     let titleY = 130;
@@ -610,13 +634,9 @@ function drawDifficultyMenu() {
     ctx.fillStyle = '#f8d038'; ctx.fillText('CHỌN ĐỘ KHÓ', titleX, titleY);
     ctx.restore();
 
-    // Dễ (Map Giữa - Xanh)[cite: 6]
     drawDiffButton(diffEasyBtn, 'DỄ (MAP GIỮA)', '#54cb37');
-    // Trung bình (Map Tím)[cite: 6]
     drawDiffButton(diffNormalBtn, 'TRUNG BÌNH (TÍM)', '#9a50c8');
-    // Khó (Map Đỏ)[cite: 6]
     drawDiffButton(diffHardBtn, 'KHÓ (MAP ĐỎ)', '#d83838');
-    // Quay lại
     drawDiffButton(diffBackBtn, 'QUAY LẠI', '#555555');
 }
 
