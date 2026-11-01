@@ -192,24 +192,21 @@ function drawSinglePipe(x, y, width, height, isTop) {
     const rimX = x - rimExtraWidth / 2;
     const rimW = width + rimExtraWidth;
 
-    // Màu sắc Pixel Art Chuẩn
-    const colDarkBorder = '#232b1a'; // Viền đen sậm
-    const colMainGreen  = '#75cb27'; // Xanh lá chính
-    const colLightGreen = '#b8e637'; // Xanh nhạt bề mặt
-    const colWhiteLine  = '#ffffff'; // Vệt phản quang trắng
-    const colDarkGreen  = '#549c1b'; // Xanh đậm đổ bóng bên phải
+    const colDarkBorder = '#232b1a';
+    const colMainGreen  = '#75cb27';
+    const colLightGreen = '#b8e637';
+    const colWhiteLine  = '#ffffff';
+    const colDarkGreen  = '#549c1b';
 
     ctx.save();
 
     if (isTop) {
-        // --- ỐNG TRÊN ---
+        // Ống Trên
         let bodyH = Math.max(0, height - rimHeight);
 
-        // 1. Thân ống
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(x, 0, width, bodyH);
 
-        // Đổ mảng màu thân
         ctx.fillStyle = colLightGreen;
         ctx.fillRect(x + 4, 0, 10, bodyH);
         ctx.fillStyle = colWhiteLine;
@@ -217,12 +214,10 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillStyle = colDarkGreen;
         ctx.fillRect(x + width - 12, 0, 12, bodyH);
 
-        // Viền thân ống
         ctx.strokeStyle = colDarkBorder;
         ctx.lineWidth = 3;
         ctx.strokeRect(x, 0, width, bodyH);
 
-        // 2. Đầu ống (Nắp ống nhô rộng)
         let rimY = bodyH;
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(rimX, rimY, rimW, rimHeight);
@@ -234,22 +229,19 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillStyle = colDarkGreen;
         ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
 
-        // Viền đầu ống
         ctx.strokeStyle = colDarkBorder;
         ctx.lineWidth = 3;
         ctx.strokeRect(rimX, rimY, rimW, rimHeight);
 
-        // Đường bóng đổ dưới vành ống
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
         ctx.fillRect(x, rimY + rimHeight, width, 4);
 
     } else {
-        // --- ỐNG DƯỚI ---
+        // Ống Dưới - Kéo dài xuống tận đáy màn hình để không bị lợt mặt đất
         let rimY = y;
         let bodyY = y + rimHeight;
-        let bodyH = Math.max(0, canvas.height - 80 - bodyY);
+        let bodyH = Math.max(0, canvas.height - bodyY);
 
-        // 1. Thân ống
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(x, bodyY, width, bodyH);
 
@@ -260,12 +252,10 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillStyle = colDarkGreen;
         ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
 
-        // Viền thân
         ctx.strokeStyle = colDarkBorder;
         ctx.lineWidth = 3;
         ctx.strokeRect(x, bodyY, width, bodyH);
 
-        // 2. Đầu ống
         ctx.fillStyle = colMainGreen;
         ctx.fillRect(rimX, rimY, rimW, rimHeight);
 
@@ -276,12 +266,10 @@ function drawSinglePipe(x, y, width, height, isTop) {
         ctx.fillStyle = colDarkGreen;
         ctx.fillRect(rimX + rimW - 14, rimY, 14, rimHeight);
 
-        // Viền đầu ống
         ctx.strokeStyle = colDarkBorder;
         ctx.lineWidth = 3;
         ctx.strokeRect(rimX, rimY, rimW, rimHeight);
 
-        // Bóng đổ của nắp ống lên thân
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
         ctx.fillRect(x, bodyY, width, 4);
     }
@@ -294,9 +282,7 @@ const pipes = {
     items: [], gap: 130, width: 56, speed: 2,
     draw() {
         this.items.forEach(p => {
-            // Vẽ Ống Trên
             drawSinglePipe(p.x, 0, this.width, p.top, true);
-            // Vẽ Ống Dưới
             drawSinglePipe(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false);
         });
     },
@@ -310,7 +296,6 @@ const pipes = {
         this.items.forEach((p, index) => {
             p.x -= this.speed;
 
-            // Tính toán va chạm chính xác theo vành ống nhô rộng
             let rimExtra = 3;
             if (bird.x + bird.radius > p.x - rimExtra && bird.x - bird.radius < p.x + this.width + rimExtra &&
                (bird.y - bird.radius < p.top || bird.y + bird.radius > p.bottom)) {
@@ -326,9 +311,8 @@ const pipes = {
     reset() { this.items = []; }
 };
 
-// --- MẶT ĐẤT VÀ THÀNH PHỐ NỀN ---
+// --- MẶT ĐẤT VÀ NỀN THÀNH PHỐ ---
 function drawBackgroundCity() {
-    // Vẽ núi / mây trôi xa
     ctx.fillStyle = '#a1e4c3';
     ctx.beginPath();
     ctx.arc(60, 520, 70, 0, Math.PI * 2);
@@ -337,7 +321,6 @@ function drawBackgroundCity() {
     ctx.arc(440, 530, 75, 0, Math.PI * 2);
     ctx.fill();
 
-    // Các tòa nhà chọc trời nhạt màu ở nền đằng sau
     ctx.fillStyle = '#83d8b4';
     ctx.fillRect(20, 480, 40, 80);
     ctx.fillRect(80, 450, 50, 110);
@@ -350,12 +333,10 @@ function drawBackgroundCity() {
 function drawGround() {
     drawBackgroundCity();
 
-    // Đất trồng cỏ
     ctx.fillStyle = '#ded895'; ctx.fillRect(0, canvas.height - 80, canvas.width, 80);
     ctx.strokeStyle = '#232b1a'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(0, canvas.height - 80); ctx.lineTo(canvas.width, canvas.height - 80); ctx.stroke();
     
-    // Cỏ xanh lá mạ trên mặt đất
     ctx.fillStyle = '#75cb27'; ctx.fillRect(0, canvas.height - 80, canvas.width, 16);
     ctx.fillStyle = '#549c1b'; ctx.fillRect(0, canvas.height - 68, canvas.width, 4);
 }
@@ -503,14 +484,25 @@ function triggerGameOver() {
     if (gameState !== 'GAMEOVER') { playSound('hit'); gameState = 'GAMEOVER'; }
 }
 
+// --- VÒNG LẶP CHÍNH (ĐÃ SỬA THỨ TỰ VẼ MẶT ĐẤT & ỐNG CỐNG) ---
 function loop() {
+    // 1. Vẽ nền trời
     ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     if (gameState === 'PLAYING') {
         bird.update(); pipes.update(); frames++;
     }
-    pipes.draw(); drawGround();
+
+    // 2. Vẽ ống cống trước (nằm đằng sau mặt đất)
+    pipes.draw(); 
+
+    // 3. Vẽ mặt đất che lên chân ống cống
+    drawGround();
+
+    // 4. Vẽ chú chim và giao diện UI
     if (gameState === 'PLAYING') bird.draw();
     drawUI();
+
     requestAnimationFrame(loop);
 }
 
