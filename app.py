@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Full Features", layout="centered")
+st.set_page_config(page_title="Flappy Bird - 8-Bit Chiptune Theme", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -40,34 +40,35 @@ game_html = """
 const canvas = document.getElementById('birdCanvas');
 const ctx = canvas.getContext('2d');
 
-// --- HỆ THỐNG ÂM THANH & NHẠC NỀN CHIPTUNE 8-BIT ---
+// --- HỆ THỐNG ÂM THANH CHIPTUNE 8-BIT BẢN GỐC ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
 let isMusicPlaying = false;
 let musicInterval = null;
 
-const melody = [
-    {n: 523.25, d: 0.15}, {n: 659.25, d: 0.15}, {n: 783.99, d: 0.15}, {n: 1046.50, d: 0.3},
-    {n: 783.99, d: 0.15}, {n: 1046.50, d: 0.4}, {n: 659.25, d: 0.3}, {n: 523.25, d: 0.3},
-    {n: 587.33, d: 0.15}, {n: 698.46, d: 0.15}, {n: 880.00, d: 0.15}, {n: 1174.66, d: 0.3},
-    {n: 880.00, d: 0.15}, {n: 1174.66, d: 0.4}, {n: 698.46, d: 0.3}, {n: 523.25, d: 0.3}
+// Giai điệu bản nhạc 8-bit tưng bừng và dồn dập
+const originalMelody = [
+    {n: 523.25, d: 0.12}, {n: 659.25, d: 0.12}, {n: 783.99, d: 0.12}, {n: 1046.50, d: 0.25},
+    {n: 880.00, d: 0.12}, {n: 987.77, d: 0.12}, {n: 1174.66, d: 0.25}, {n: 1046.50, d: 0.25},
+    {n: 783.99, d: 0.12}, {n: 659.25, d: 0.12}, {n: 523.25, d: 0.25}, {n: 587.33, d: 0.12},
+    {n: 698.46, d: 0.12}, {n: 783.99, d: 0.25}, {n: 659.25, d: 0.25}, {n: 523.25, d: 0.4}
 ];
 let melodyIndex = 0;
 
-function playChiptuneNote() {
+function playOriginalChiptuneNote() {
     if (!isMusicPlaying) return;
     if (audioCtx.state === 'suspended') audioCtx.resume();
 
-    const note = melody[melodyIndex];
-    melodyIndex = (melodyIndex + 1) % melody.length;
+    const note = originalMelody[melodyIndex];
+    melodyIndex = (melodyIndex + 1) % originalMelody.length;
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'square';
     osc.frequency.setValueAtTime(note.n, audioCtx.currentTime);
 
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
     gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + note.d);
 
     osc.connect(gain);
@@ -84,7 +85,7 @@ function toggleMusic() {
     isMusicPlaying = !isMusicPlaying;
     if (isMusicPlaying) {
         melodyIndex = 0;
-        musicInterval = setInterval(playChiptuneNote, 220);
+        musicInterval = setInterval(playOriginalChiptuneNote, 180);
     } else {
         clearInterval(musicInterval);
     }
@@ -482,7 +483,6 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ HÀNG RĂNG NHỌN TẠI MIỆNG CỐNG (CHO MAP KHÓ) ---
 function drawPipeTeeth(x, rimY, width, isTop) {
     ctx.save();
     ctx.fillStyle = '#ffffff';
@@ -704,7 +704,7 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawHardPipeEyes(rX, rimY, rW, true);
-            drawPipeTeeth(x, rimY, width, true); // ĐÃ KHÔI PHỤC HÀNG RĂNG NHỌN Ở MAP KHÓ
+            drawPipeTeeth(x, rimY, width, true);
         } else {
             let rimY = y;
             let bodyY = y + 28;
@@ -723,7 +723,7 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawHardPipeEyes(rX, rimY, rW, false);
-            drawPipeTeeth(x, rimY, width, false); // ĐÃ KHÔI PHỤC HÀNG RĂNG NHỌN Ở MAP KHÓ
+            drawPipeTeeth(x, rimY, width, false);
         }
     }
     ctx.restore();
