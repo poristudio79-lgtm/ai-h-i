@@ -437,44 +437,6 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ HÀNG RĂNG NHỌN TẠI MIỆNG ỐNG CỐNG ---
-function drawPipeTeeth(x, rimY, width, isTop) {
-    ctx.save();
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#280808';
-    ctx.lineWidth = 2;
-
-    const toothWidth = 8;
-    const toothHeight = 9;
-
-    if (isTop) {
-        let bottomEdgeY = rimY + 28;
-        for (let i = 2; i < width + 6 - toothWidth; i += toothWidth + 2) {
-            let tx = x - 3 + i;
-            ctx.beginPath();
-            ctx.moveTo(tx, bottomEdgeY);
-            ctx.lineTo(tx + toothWidth / 2, bottomEdgeY + toothHeight);
-            ctx.lineTo(tx + toothWidth, bottomEdgeY);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-    } else {
-        let topEdgeY = rimY;
-        for (let i = 2; i < width + 6 - toothWidth; i += toothWidth + 2) {
-            let tx = x - 3 + i;
-            ctx.beginPath();
-            ctx.moveTo(tx, topEdgeY);
-            ctx.lineTo(tx + toothWidth / 2, topEdgeY - toothHeight);
-            ctx.lineTo(tx + toothWidth, topEdgeY);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-    }
-    ctx.restore();
-}
-
 // --- HÀM VẼ GĂNG TAY TÍM ---
 function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.save();
@@ -598,8 +560,6 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
             ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
-
-            drawPipeTeeth(x, rimY, width, true);
         } else {
             let rimY = y;
             let bodyY = y + 28;
@@ -616,8 +576,6 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.fillStyle = colWhiteLine; ctx.fillRect(rX + 17, rimY, 4, 28);
             ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
-
-            drawPipeTeeth(x, rimY, width, false);
         }
     }
     else if (difficulty === 'NORMAL') {
@@ -627,22 +585,20 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
 
         if (isTop) {
             let bodyH = Math.max(0, height - 44);
-            // Thân cống màu tím liền mạch, không còn sọc dọc
+            // Thân ống cống màu tím liền mạch, không còn vệt sọc dọc
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
             ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
             drawPurpleFistGlove(x, bodyH + 44, width, true);
-            drawPipeTeeth(x, bodyH + 16, width, true);
         } else {
             let bodyY = y + 44;
             let bodyH = Math.max(0, canvas.height - bodyY);
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
-            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
             drawPurpleFistGlove(x, y, width, false);
-            drawPipeTeeth(x, y, width, false);
         }
     }
     else if (difficulty === 'HARD') {
@@ -669,7 +625,6 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawHardPipeEyes(rX, rimY, rW, true);
-            drawPipeTeeth(x, rimY, width, true);
         } else {
             let rimY = y;
             let bodyY = y + 28;
@@ -688,7 +643,6 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawHardPipeEyes(rX, rimY, rW, false);
-            drawPipeTeeth(x, rimY, width, false);
         }
     }
     ctx.restore();
