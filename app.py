@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - 8-Bit Chiptune Theme", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Big Music Button", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -40,14 +40,13 @@ game_html = """
 const canvas = document.getElementById('birdCanvas');
 const ctx = canvas.getContext('2d');
 
-// --- HỆ THỐNG ÂM THANH CHIPTUNE 8-BIT BẢN GỐC ---
+// --- HỆ THỐNG ÂM THANH CHIPTUNE 8-BIT ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
 let isMusicPlaying = false;
 let musicInterval = null;
 
-// Giai điệu bản nhạc 8-bit tưng bừng và dồn dập
 const originalMelody = [
     {n: 523.25, d: 0.12}, {n: 659.25, d: 0.12}, {n: 783.99, d: 0.12}, {n: 1046.50, d: 0.25},
     {n: 880.00, d: 0.12}, {n: 987.77, d: 0.12}, {n: 1174.66, d: 0.25}, {n: 1046.50, d: 0.25},
@@ -153,7 +152,8 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-const musicBtn = { x: 410, y: 15, w: 55, h: 32 };
+// NÚT BẬT/TẮT NHẠC ĐÃ ĐƯỢC LÀM TO RÕ Ở GIỮA PHÍA TRÊN (Rộng 140, Cao 45)
+const musicBtn = { x: 170, y: 12, w: 140, h: 45 };
 
 // --- HÀM VẼ NHÂN VẬT ---
 function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
@@ -795,21 +795,22 @@ function drawMenuButton(btn, isPlayBtn) {
     }
 }
 
+// --- VẼ NÚT BẬT / TẮT NHẠC TO RÕ Ở GIỮA PHÍA TRÊN ---
 function drawMusicButton() {
     ctx.save();
-    ctx.fillStyle = isMusicPlaying ? '#54cb37' : '#e83838';
-    ctx.strokeStyle = '#2b2b2b';
+    ctx.fillStyle = isMusicPlaying ? '#2ecc71' : '#e74c3c';
+    ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.roundRect(musicBtn.x, musicBtn.y, musicBtn.w, musicBtn.h, 8);
+    ctx.roundRect(musicBtn.x, musicBtn.y, musicBtn.w, musicBtn.h, 10);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 12px "Courier New", monospace';
+    ctx.font = 'bold 16px "Courier New", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(isMusicPlaying ? '♪ BẬT' : '♪ TẮT', musicBtn.x + musicBtn.w / 2, musicBtn.y + musicBtn.h / 2);
+    ctx.fillText(isMusicPlaying ? '♪ NHẠC: BẬT' : '♪ NHẠC: TẮT', musicBtn.x + musicBtn.w / 2, musicBtn.y + musicBtn.h / 2);
     ctx.restore();
 }
 
@@ -1130,8 +1131,8 @@ function drawUI() {
     } else if (gameState === 'PLAYING') {
         ctx.fillStyle = '#fff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
         ctx.font = '36px Courier New'; ctx.textAlign = 'center';
-        ctx.strokeText(score, canvas.width / 2, 60);
-        ctx.fillText(score, canvas.width / 2, 60);
+        ctx.strokeText(score, canvas.width / 2, 80);
+        ctx.fillText(score, canvas.width / 2, 80);
     } else if (gameState === 'GAMEOVER') {
         drawGameOverScreen();
     }
