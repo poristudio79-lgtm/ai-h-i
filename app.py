@@ -94,8 +94,8 @@ const CHARACTERS = [
     { id: 5, name: 'NARWHAL', color: '#20b2aa', effect: 'Băng giá Tuyết' }
 ];
 
-const menuPlayBtn = { x: 75, y: 390, w: 145, h: 90 };
-const menuCharBtn = { x: 260, y: 390, w: 145, h: 90 };
+const menuPlayBtn = { x: 75, y: 410, w: 145, h: 90 };
+const menuCharBtn = { x: 260, y: 410, w: 145, h: 90 };
 
 const diffEasyBtn = { x: 100, y: 220, w: 280, h: 65 };   
 const diffNormalBtn = { x: 100, y: 305, w: 280, h: 65 }; 
@@ -330,17 +330,14 @@ const pipes = {
                 triggerGameOver();
             }
 
-            // Kiểm tra va chạm cây ăn thịt sắc nét
             if (p.hasPlant) {
                 let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
                 let plantX = p.x + this.width / 2;
                 
-                // Cây ở ống trên
                 let plantTopHeadY = p.top - plantHeight;
                 if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantTopHeadY) < 22) {
                     triggerGameOver();
                 }
-                // Cây ở ống dưới
                 let plantBottomHeadY = p.bottom + plantHeight;
                 if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantBottomHeadY) < 22) {
                     triggerGameOver();
@@ -366,14 +363,13 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ CÂY ĂN THỊT SIÊU SẮC NÉT (CHUẨN MẪU VECTOR) ---
+// --- HÀM VẼ CÂY ĂN THỊT ---
 function drawPiranhaPlant(x, rimY, isTop) {
     ctx.save();
-    let plantHeight = 35 + Math.sin(frames * 0.1) * 22; // Độ thò thụt sinh động
-    let px = x + 28; // Căn chính giữa ống cống
+    let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
+    let px = x + 28;
     let headY = isTop ? (rimY - plantHeight) : (rimY + plantHeight);
 
-    // 1. Thân cuống xanh đậm viền sắc nét
     ctx.fillStyle = '#229822';
     ctx.strokeStyle = '#0e420e';
     ctx.lineWidth = 2.5;
@@ -385,23 +381,19 @@ function drawPiranhaPlant(x, rimY, isTop) {
         ctx.strokeRect(px - 5, rimY, 10, -plantHeight);
     }
 
-    // 2. Hai chiếc lá xanh mướt có gân lá rõ ràng hai bên thân
     ctx.fillStyle = '#32b832';
     ctx.strokeStyle = '#0e420e';
     ctx.lineWidth = 2.5;
     let leafY = isTop ? (rimY + plantHeight * 0.5) : (rimY - plantHeight * 0.5);
     
-    // Lá trái
     ctx.beginPath();
     ctx.ellipse(px - 16, leafY, 14, 7, -0.4, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     
-    // Lá phải
     ctx.beginPath();
     ctx.ellipse(px + 16, leafY, 14, 7, 0.4, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
 
-    // 3. Đầu búp tròn màu đỏ tươi có viền đen đậm sắc sảo
     ctx.fillStyle = '#e82020';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 3.5;
@@ -410,19 +402,14 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.fill();
     ctx.stroke();
 
-    // 4. Các đốm trắng lớn (White Spots) viền rõ nét trên đầu búp
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 2;
     
-    // Đốm trái
     ctx.beginPath(); ctx.arc(px - 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    // Đốm phải
     ctx.beginPath(); ctx.arc(px + 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    // Đốm dưới
     ctx.beginPath(); ctx.arc(px, headY + 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
 
-    // 5. Miệng mở hình chữ V trắng rực rỡ với viền sắc nét
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 3;
@@ -442,7 +429,6 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.fill();
     ctx.stroke();
 
-    // 6. Răng nhọn sắc bén bên trong miệng
     ctx.fillStyle = '#e82020';
     if (isTop) {
         ctx.fillRect(px - 6, headY - 9, 3, 5);
@@ -523,7 +509,7 @@ function drawPurpleFistGlove(x, y, width, isTop) {
 
         ctx.fillStyle = colMain; ctx.fillRect(gx - 10, gy + 16, 10, 16);
         ctx.fillStyle = colLight; ctx.fillRect(gx - 8, gy + 18, 4, 12);
-        ctx.strokeStyle = colBorder; ctx.lineWidth = 3; ctx.strokeRect(gx - 10, gy + 16, 10, 16);
+        ctx.strokeStyle = colBorder; ctx.lineWidth = 3; ctx.strokeRect(gx - 10, gy + 18, 4, 12);
 
         ctx.strokeStyle = colBorder; ctx.lineWidth = 3.5;
         ctx.strokeRect(gx - 4, gy + 12, width + 20, 32);
@@ -684,9 +670,9 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.fillStyle = '#ffffff';
             for (let i = 0; i < width; i += 8) {
                 ctx.beginPath();
-                ctx.moveTo(x + i, rimY);
-                ctx.lineTo(x + i + 4, rimY - 6);
-                ctx.lineTo(x + i + 8, rimY);
+                ctx.moveTo(i, rimY);
+                ctx.lineTo(i + 4, rimY - 6);
+                ctx.lineTo(i + 8, rimY);
                 ctx.fill();
             }
 
@@ -763,19 +749,160 @@ function drawMenuButton(btn, isPlayBtn) {
     }
 }
 
+// --- HÀM VẼ TIÊU ĐỀ "FLAPPY BIRD" KIỂU 3D DẠNG PIXEL THEO CHUẨN MẪU HÌNH ẢNH ---
+function drawRetroPixelTitle(cx, topY) {
+    ctx.save();
+    const p = 5; // Kích thước ô pixel khối 3D
+
+    // Bản đồ cấu trúc Pixel của từng ký tự chữ cái (1 = Khối Pixel)
+    const LETTER_PIXELS = {
+        'F': [
+            [1,1,1,1],
+            [1,0,0,0],
+            [1,1,1,0],
+            [1,0,0,0],
+            [1,0,0,0]
+        ],
+        'L': [
+            [1,0,0,0],
+            [1,0,0,0],
+            [1,0,0,0],
+            [1,0,0,0],
+            [1,1,1,1]
+        ],
+        'A': [
+            [0,1,1,0],
+            [1,0,0,1],
+            [1,1,1,1],
+            [1,0,0,1],
+            [1,0,0,1]
+        ],
+        'P': [
+            [1,1,1,0],
+            [1,0,0,1],
+            [1,1,1,0],
+            [1,0,0,0],
+            [1,0,0,0]
+        ],
+        'Y': [
+            [1,0,0,1],
+            [1,0,0,1],
+            [0,1,1,0],
+            [0,1,0,0],
+            [0,1,0,0]
+        ],
+        'B': [
+            [1,1,1,0],
+            [1,0,0,1],
+            [1,1,1,0],
+            [1,0,0,1],
+            [1,1,1,0]
+        ],
+        'I': [
+            [1,1,1],
+            [0,1,0],
+            [0,1,0],
+            [0,1,0],
+            [1,1,1]
+        ],
+        'R': [
+            [1,1,1,0],
+            [1,0,0,1],
+            [1,1,1,0],
+            [1,0,1,0],
+            [1,0,0,1]
+        ],
+        'D': [
+            [1,1,1,0],
+            [1,0,0,1],
+            [1,0,0,1],
+            [1,0,0,1],
+            [1,1,1,0]
+        ]
+    };
+
+    // Bảng màu rực rỡ riêng cho từng ký tự
+    const word1Colors = ['#f8d038', '#f85820', '#e82878', '#a038d0', '#38a8b8', '#509848'];
+    const word2Colors = ['#a038d0', '#f8d038', '#f85820', '#38a8b8'];
+
+    // 1. Vẽ dòng chữ "FLAPPY"
+    let word1 = ['F','L','A','P','P','Y'];
+    let startX1 = cx - 135;
+    let currX1 = startX1;
+
+    word1.forEach((char, idx) => {
+        let grid = LETTER_PIXELS[char];
+        let color = word1Colors[idx % word1Colors.length];
+
+        for (let r = 0; r < grid.length; r++) {
+            for (let c = 0; c < grid[r].length; c++) {
+                if (grid[r][c] === 1) {
+                    let bx = currX1 + c * p;
+                    let by = topY + r * p;
+
+                    // Bóng đổ 3D viền đen đậm
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(bx + 4, by + 4, p, p);
+
+                    // Mặt khối màu chữ tươi sáng
+                    ctx.fillStyle = color;
+                    ctx.fillRect(bx, by, p, p);
+
+                    // Viền nét đậm sắc sảo
+                    ctx.strokeStyle = '#2b221e';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(bx, by, p, p);
+                }
+            }
+        }
+        currX1 += (grid[0].length + 1) * p;
+    });
+
+    // 2. Vẽ dòng chữ "BIRD"
+    let word2 = ['B','I','R','D'];
+    let startX2 = cx - 80;
+    let currX2 = startX2;
+    let topY2 = topY + 38;
+
+    word2.forEach((char, idx) => {
+        let grid = LETTER_PIXELS[char];
+        let color = word2Colors[idx % word2Colors.length];
+
+        for (let r = 0; r < grid.length; r++) {
+            for (let c = 0; c < grid[r].length; c++) {
+                if (grid[r][c] === 1) {
+                    let bx = currX2 + c * p;
+                    let by = topY2 + r * p;
+
+                    // Bóng đổ 3D viền đen đậm
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(bx + 4, by + 4, p, p);
+
+                    // Mặt khối màu chữ tươi sáng
+                    ctx.fillStyle = color;
+                    ctx.fillRect(bx, by, p, p);
+
+                    // Viền nét đậm sắc sảo
+                    ctx.strokeStyle = '#2b221e';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(bx, by, p, p);
+                }
+            }
+        }
+        currX2 += (grid[0].length + 1) * p;
+    });
+
+    ctx.restore();
+}
+
 function drawMainMenu() {
     let titleX = canvas.width / 2;
-    let titleY = 130;
+    
+    // Vẽ Tiêu Đề Flappy Bird Kiểu 3D Pixel Rực Rỡ Chuẩn Mẫu Hình Ảnh
+    drawRetroPixelTitle(titleX, 90);
 
-    ctx.save();
-    ctx.font = '900 48px "Courier New", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#000000'; ctx.fillText('FlappyBird', titleX + 4, titleY + 4);
-    ctx.fillStyle = '#ffffff'; ctx.fillText('FlappyBird', titleX, titleY);
-    ctx.restore();
-
-    let floatY = 230 + Math.sin(frames * 0.08) * 8;
-    drawPixelBird(canvas.width / 2, floatY, selectedSkin, 3.0);
+    let floatY = 250 + Math.sin(frames * 0.08) * 8;
+    drawPixelBird(canvas.width / 2, floatY, selectedSkin, 3.2);
 
     drawMenuButton(menuPlayBtn, true);
     drawMenuButton(menuCharBtn, false);
