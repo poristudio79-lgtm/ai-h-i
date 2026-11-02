@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - No Piranha Plants", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Clean Normal Map", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -623,15 +623,12 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
     else if (difficulty === 'NORMAL') {
         const colDarkBorder = '#281038';
         const colMainPurple = '#9a50c8';
-        const colLightPurple= '#c088f0';
-        const colWhiteLine  = '#ffffff';
         const colDarkPurple = '#682898';
 
         if (isTop) {
             let bodyH = Math.max(0, height - 44);
+            // Thân cống màu tím liền mạch, không còn sọc dọc
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
-            ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, 0, 10, bodyH);
-            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, 0, 4, bodyH);
             ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
@@ -641,8 +638,6 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             let bodyY = y + 44;
             let bodyH = Math.max(0, canvas.height - bodyY);
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
-            ctx.fillStyle = colLightPurple; ctx.fillRect(x + 4, bodyY, 10, bodyH);
-            ctx.fillStyle = colWhiteLine; ctx.fillRect(x + 14, bodyY, 4, bodyH);
             ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
