@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Music Toggle", layout="centered")
+st.set_page_config(page_title="Flappy Bird - 8-Bit Chiptune Music", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -36,34 +36,62 @@ game_html = """
     <canvas id="birdCanvas" width="480" height="640"></canvas>
 </div>
 
-<!-- THẺ AUDIO NHẠC NỀN FLAPPY BIRD -->
-<audio id="bgMusic" loop>
-    <source src="https://vgmsite.com/soundtracks/flappy-bird-mobile/flappy-bird-theme.mp3" type="audio/mpeg">
-</audio>
-
 <script>
 const canvas = document.getElementById('birdCanvas');
 const ctx = canvas.getContext('2d');
-const bgMusic = document.getElementById('bgMusic');
-bgMusic.volume = 0.4;
 
-let isMusicPlaying = false;
-
-function toggleMusic() {
-    if (isMusicPlaying) {
-        bgMusic.pause();
-        isMusicPlaying = false;
-    } else {
-        bgMusic.play().then(() => {
-            isMusicPlaying = true;
-        }).catch(e => console.log("Audio play blocked", e));
-    }
-}
-
-// --- HỆ THỐNG ÂM THANH 8-BIT (HIỆU ỨNG NHẢY, ĂN ĐIỂM, THUA) ---
+// --- HỆ THỐNG ÂM THANH & NHẠC NỀN CHIPTUNE 8-BIT ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
+let isMusicPlaying = false;
+let musicInterval = null;
+
+// Giai điệu nhạc nền 8-bit phong cách Flappy Bird (Nốt nhạc & thời lượng)
+const melody = [
+    {n: 523.25, d: 0.15}, {n: 659.25, d: 0.15}, {n: 783.99, d: 0.15}, {n: 1046.50, d: 0.3},
+    {n: 783.99, d: 0.15}, {n: 1046.50, d: 0.4}, {n: 659.25, d: 0.3}, {n: 523.25, d: 0.3},
+    {n: 587.33, d: 0.15}, {n: 698.46, d: 0.15}, {n: 880.00, d: 0.15}, {n: 1174.66, d: 0.3},
+    {n: 880.00, d: 0.15}, {n: 1174.66, d: 0.4}, {n: 698.46, d: 0.3}, {n: 523.25, d: 0.3}
+];
+let melodyIndex = 0;
+
+function playChiptuneNote() {
+    if (!isMusicPlaying) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const note = melody[melodyIndex];
+    melodyIndex = (melodyIndex + 1) % melody.length;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square'; // Âm thanh vuông đặc trưng máy game cổ điển
+    osc.frequency.setValueAtTime(note.n, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + note.d);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + note.d);
+}
+
+function toggleMusic() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    isMusicPlaying = !isMusicPlaying;
+    if (isMusicPlaying) {
+        melodyIndex = 0;
+        musicInterval = setInterval(playChiptuneNote, 220); // Tốc độ nhịp điệu
+    } else {
+        clearInterval(musicInterval);
+    }
+}
+
+// Hiệu ứng âm thanh tương tác trong game (Nhảy, Điểm, Thua)
 function playSound(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
@@ -1078,7 +1106,6 @@ function drawUI() {
     } else if (gameState === 'GAMEOVER') {
         drawGameOverScreen();
     }
-    // Vẽ nút nhạc luôn xuất hiện ở mọi màn hình
     drawMusicButton();
 }
 
@@ -1115,7 +1142,7 @@ function handleInteraction(clientX, clientY) {
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
 
-    // Kiểm tra bấm nút Bật/Tắt Nhạc (ưu tiên cao nhất)
+    // Kiểm tra bấm nút Bật/Tắt Nhạc
     if (clickX >= musicBtn.x && clickX <= musicBtn.x + musicBtn.w &&
         clickY >= musicBtn.y && clickY <= musicBtn.y + musicBtn.h) {
         toggleMusic();
