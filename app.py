@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Multi Character", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Classic Bird Shapes", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -105,75 +105,101 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-// --- HÀM VẼ NHÂN VẬT PIXEL ---
-function drawPixelBird(x, y, skinId, scale = 2.6, rotation = 0) {
+// --- HÀM VẼ CON CHIM FLAPPY BIRD CỔ ĐIỂN CHUẨN MẪU (BẦU TRÒN - MẮT TO - MỎ DẦY) ---
+function drawClassicPixelBird(x, y, skinId, scale = 2.4, rotation = 0) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(rotation);
     const p = scale;
 
-    if (skinId === 0) {
-        ctx.fillStyle = '#2b221e'; ctx.fillRect(-8*p, -7*p, 16*p, 13*p);
-        ctx.fillStyle = '#f8ea38'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
-        ctx.fillStyle = '#e82878'; ctx.fillRect(-7*p, -7*p, 14*p, 3*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(-4*p, -7*p, 2*p, 3*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -4*p, 7*p, 5*p);
-        ctx.fillStyle = '#2b221e'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
-        ctx.fillStyle = '#e82878'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, 0*p, 4*p, 3*p);
-    } 
-    else if (skinId === 1) {
-        ctx.fillStyle = '#2b221e'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
-        ctx.fillStyle = '#f8d038'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
-        ctx.fillStyle = '#f8b000'; ctx.fillRect(-6*p, 2*p, 10*p, 2*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -6*p, 7*p, 6*p);
-        ctx.fillStyle = '#2b221e'; ctx.fillRect(3*p, -4*p, 2*p, 3*p);
-        ctx.fillStyle = '#f85820'; ctx.fillRect(2*p, 0*p, 7*p, 4*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
-    } 
-    else if (skinId === 2) {
-        ctx.fillStyle = '#1e2b1e'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
-        ctx.fillStyle = '#509848'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
-        ctx.fillStyle = '#78c038'; ctx.fillRect(-5*p, -10*p, 10*p, 4*p); ctx.fillRect(-7*p, -7*p, 14*p, 2*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -5*p, 7*p, 6*p);
-        ctx.fillStyle = '#1e2b1e'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
-        ctx.fillStyle = '#f87820'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
-    }
-    else if (skinId === 3) {
-        ctx.fillStyle = '#261933'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
-        ctx.fillStyle = '#8838d0'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
-        ctx.fillStyle = '#f858a8'; ctx.fillRect(-6*p, -10*p, 11*p, 4*p);
-        ctx.fillRect(-7*p, -8*p, 2*p, 2*p); ctx.fillRect(-2*p, -8*p, 2*p, 2*p); ctx.fillRect(3*p, -8*p, 2*p, 2*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -5*p, 7*p, 6*p);
-        ctx.fillStyle = '#261933'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
-        ctx.fillStyle = '#f89020'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
-        ctx.fillStyle = '#f878c0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
-    }
-    else if (skinId === 4) {
-        ctx.fillStyle = '#16282b'; ctx.fillRect(-8*p, -6*p, 16*p, 12*p);
-        ctx.fillStyle = '#38a8b8'; ctx.fillRect(-7*p, -5*p, 14*p, 10*p);
-        ctx.fillStyle = '#c048d0'; ctx.fillRect(3*p, -11*p, 3*p, 5*p);
-        ctx.fillStyle = '#f878e8'; ctx.fillRect(4*p, -9*p, 2*p, 2*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0*p, -5*p, 7*p, 6*p);
-        ctx.fillStyle = '#16282b'; ctx.fillRect(3*p, -3*p, 2*p, 3*p);
-        ctx.fillStyle = '#306870'; ctx.fillRect(2*p, 1*p, 7*p, 4*p);
-        ctx.fillStyle = '#78e0f0'; ctx.fillRect(-7*p, -1*p, 4*p, 3*p);
-    }
-    else if (skinId === 5) {
-        ctx.fillStyle = '#0a1e24'; ctx.fillRect(-10*p, -4*p, 20*p, 10*p);
-        ctx.fillStyle = '#20b2aa'; ctx.fillRect(-9*p, -3*p, 18*p, 8*p);
-        ctx.fillStyle = '#e0f8f8'; ctx.fillRect(-9*p, 1*p, 18*p, 4*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(7*p, -7*p, 2*p, 6*p); ctx.fillRect(8*p, -9*p, 2*p, 3*p);
-        ctx.fillStyle = '#20b2aa'; ctx.fillRect(-13*p, -6*p, 4*p, 6*p); ctx.fillRect(-13*p, 2*p, 4*p, 6*p);
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(1*p, -3*p, 5*p, 5*p);
-        ctx.fillStyle = '#0a1e24'; ctx.fillRect(3*p, -2*p, 2*p, 3*p);
+    // Bảng phối màu cho từng Skin giữ nguyên bản sắc riêng nhưng chuyển sang phom chim tròn cổ điển
+    const skinThemes = [
+        { body: '#e82878', belly: '#f8a0c8', wing: '#ffffff', beak: '#f85820', outline: '#2b1018' }, // 0: GBI (Hồng)
+        { body: '#f8d038', belly: '#f8ea88', wing: '#ffffff', beak: '#f85820', outline: '#2b221e' }, // 1: OHINH (Vàng chuẩn Flappy)
+        { body: '#509848', belly: '#98e888', wing: '#ffffff', beak: '#f87820', outline: '#122b12' }, // 2: HOI BINK (Xá lá)
+        { body: '#8838d0', belly: '#c888f8', wing: '#f878c0', beak: '#f89020', outline: '#1b0a2b' }, // 3: KHON (Tím huyền bí)
+        { body: '#38a8b8', belly: '#88e0f0', wing: '#ffffff', beak: '#306870', outline: '#0a1d20' }, // 4: BINH (Xanh băng)
+        { body: '#20b2aa', belly: '#e0f8f8', wing: '#ffffff', beak: '#f85820', outline: '#081a18' }  // 5: NARWHAL (Ngọc biển)
+    ];
+
+    let t = skinThemes[skinId] || skinThemes[1];
+
+    // 1. VIỀN ĐEN ĐẬM TẠO DÁNG CHIM TRÒN BẦU BĨNH (OUTLINE)
+    ctx.fillStyle = t.outline;
+    ctx.fillRect(-7*p, -7*p, 10*p, 1*p);
+    ctx.fillRect(-10*p, -6*p, 15*p, 1*p);
+    ctx.fillRect(-12*p, -5*p, 19*p, 1*p);
+    ctx.fillRect(-13*p, -4*p, 23*p, 1*p);
+    ctx.fillRect(-14*p, -3*p, 25*p, 5*p);
+    ctx.fillRect(-13*p, 2*p, 24*p, 2*p);
+    ctx.fillRect(-12*p, 4*p, 22*p, 2*p);
+    ctx.fillRect(-10*p, 6*p, 18*p, 2*p);
+    ctx.fillRect(-7*p, 8*p, 12*p, 1*p);
+
+    // 2. MÀU THÂN CHIM (BODY)
+    ctx.fillStyle = t.body;
+    ctx.fillRect(-6*p, -6*p, 8*p, 1*p);
+    ctx.fillRect(-9*p, -5*p, 12*p, 1*p);
+    ctx.fillRect(-11*p, -4*p, 15*p, 1*p);
+    ctx.fillRect(-12*p, -3*p, 17*p, 6*p);
+    ctx.fillRect(-11*p, 3*p, 16*p, 2*p);
+    ctx.fillRect(-9*p, 5*p, 14*p, 2*p);
+    ctx.fillRect(-6*p, 7*p, 10*p, 1*p);
+
+    // 3. BỤNG CHIM SÁNG MÀU (BELLY)
+    ctx.fillStyle = t.belly;
+    ctx.fillRect(-6*p, 4*p, 9*p, 3*p);
+    ctx.fillRect(-4*p, 7*p, 5*p, 1*p);
+
+    // 4. MẮT TO TRÒN TRẮNG RỰC RỠ & TRÒNG ĐEN DỤY SẮC (EYE)
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(1*p, -6*p, 8*p, 8*p);
+    ctx.fillRect(0*p, -5*p, 10*p, 6*p);
+    
+    ctx.fillStyle = t.outline;
+    ctx.fillRect(1*p, -6*p, 8*p, 1*p);
+    ctx.fillRect(9*p, -5*p, 1*p, 6*p);
+    ctx.fillRect(1*p, 2*p, 8*p, 1*p);
+    ctx.fillRect(0*p, -5*p, 1*p, 6*p);
+
+    // Tròng đen mắt lúng lính
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(5*p, -4*p, 3*p, 5*p);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(6*p, -3*p, 1*p, 2*p); // Điểm sáng trong mắt
+
+    // 5. CÁNH CHIM VỖ TRÒN TRỊA MÀU TRẮNG VÀNG (WING)
+    ctx.fillStyle = t.outline;
+    ctx.fillRect(-11*p, -2*p, 7*p, 6*p);
+    ctx.fillStyle = t.wing;
+    ctx.fillRect(-10*p, -1*p, 5*p, 4*p);
+    ctx.fillStyle = '#f8ea88';
+    ctx.fillRect(-9*p, 1*p, 4*p, 2*p);
+
+    // 6. MỎ DẦY MÀU CAM ĐỎ RỰC RỠ (BEAK)
+    ctx.fillStyle = t.outline;
+    ctx.fillRect(2*p, 1*p, 10*p, 6*p);
+
+    ctx.fillStyle = t.beak;
+    ctx.fillRect(3*p, 2*p, 8*p, 4*p);
+    ctx.fillStyle = '#f8a020'; // Vệt sáng mỏ trên
+    ctx.fillRect(3*p, 2*p, 8*p, 2*p);
+
+    // Vạch viền chia mỏ trên & mỏ dưới
+    ctx.fillStyle = t.outline;
+    ctx.fillRect(2*p, 4*p, 9*p, 1*p);
+
+    // Thêm sừng đặc trưng cho Skin Narwhal
+    if (skinId === 5) {
+        ctx.fillStyle = '#ffffff'; ctx.strokeStyle = t.outline; ctx.lineWidth = 1.5;
+        ctx.fillRect(3*p, -11*p, 3*p, 5*p);
+        ctx.strokeRect(3*p, -11*p, 3*p, 5*p);
     }
 
     ctx.restore();
 }
 
-// --- HIỆU ỨNG ĐỘC QUYỀN RÕ NÉT & SẮC SẢO CHO TỪNG SKIN ---
+// --- HIỆU ỨNG ĐỘC QUYỀN RÕ NÉT CHO TỪNG SKIN ---
 function drawSkinEffects(x, y, skinId) {
     ctx.save();
     let time = frames * 0.12;
@@ -265,7 +291,7 @@ const bird = {
     draw() {
         let rotation = Math.min(Math.PI / 2.5, Math.max(-Math.PI / 4, (this.velocity / 12)));
         drawSkinEffects(this.x, this.y, selectedSkin);
-        drawPixelBird(this.x, this.y, selectedSkin, 2.2, rotation);
+        drawClassicPixelBird(this.x, this.y, selectedSkin, 2.2, rotation);
     },
     update() {
         this.velocity += this.gravity;
@@ -363,7 +389,7 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ CÂY ĂN THỊT ---
+// --- HÀM VẼ CÂY ĂN THỊT SIÊU SẮC NÉT ---
 function drawPiranhaPlant(x, rimY, isTop) {
     ctx.save();
     let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
@@ -745,87 +771,30 @@ function drawMenuButton(btn, isPlayBtn) {
         ctx.fillStyle = '#54cb37';
         ctx.beginPath(); ctx.moveTo(cx - 16, cy - 22); ctx.lineTo(cx + 12, cy); ctx.lineTo(cx - 16, cy); ctx.closePath(); ctx.fill();
     } else {
-        drawPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.4);
+        drawClassicPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.4);
     }
 }
 
-// --- HÀM VẼ TIÊU ĐỀ "FLAPPY BIRD" KIỂU 3D DẠNG PIXEL THEO CHUẨN MẪU HÌNH ẢNH ---
+// --- HÀM VẼ TIÊU ĐỀ "FLAPPY BIRD" KIỂU 3D PIXEL RỰC RỠ ---
 function drawRetroPixelTitle(cx, topY) {
     ctx.save();
-    const p = 5; // Kích thước ô pixel khối 3D
+    const p = 5;
 
-    // Bản đồ cấu trúc Pixel của từng ký tự chữ cái (1 = Khối Pixel)
     const LETTER_PIXELS = {
-        'F': [
-            [1,1,1,1],
-            [1,0,0,0],
-            [1,1,1,0],
-            [1,0,0,0],
-            [1,0,0,0]
-        ],
-        'L': [
-            [1,0,0,0],
-            [1,0,0,0],
-            [1,0,0,0],
-            [1,0,0,0],
-            [1,1,1,1]
-        ],
-        'A': [
-            [0,1,1,0],
-            [1,0,0,1],
-            [1,1,1,1],
-            [1,0,0,1],
-            [1,0,0,1]
-        ],
-        'P': [
-            [1,1,1,0],
-            [1,0,0,1],
-            [1,1,1,0],
-            [1,0,0,0],
-            [1,0,0,0]
-        ],
-        'Y': [
-            [1,0,0,1],
-            [1,0,0,1],
-            [0,1,1,0],
-            [0,1,0,0],
-            [0,1,0,0]
-        ],
-        'B': [
-            [1,1,1,0],
-            [1,0,0,1],
-            [1,1,1,0],
-            [1,0,0,1],
-            [1,1,1,0]
-        ],
-        'I': [
-            [1,1,1],
-            [0,1,0],
-            [0,1,0],
-            [0,1,0],
-            [1,1,1]
-        ],
-        'R': [
-            [1,1,1,0],
-            [1,0,0,1],
-            [1,1,1,0],
-            [1,0,1,0],
-            [1,0,0,1]
-        ],
-        'D': [
-            [1,1,1,0],
-            [1,0,0,1],
-            [1,0,0,1],
-            [1,0,0,1],
-            [1,1,1,0]
-        ]
+        'F': [[1,1,1,1],[1,0,0,0],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
+        'L': [[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,1,1,1]],
+        'A': [[0,1,1,0],[1,0,0,1],[1,1,1,1],[1,0,0,1],[1,0,0,1]],
+        'P': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
+        'Y': [[1,0,0,1],[1,0,0,1],[0,1,1,0],[0,1,0,0],[0,1,0,0]],
+        'B': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,1],[1,1,1,0]],
+        'I': [[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]],
+        'R': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,1,0],[1,0,0,1]],
+        'D': [[1,1,1,0],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,0]]
     };
 
-    // Bảng màu rực rỡ riêng cho từng ký tự
     const word1Colors = ['#f8d038', '#f85820', '#e82878', '#a038d0', '#38a8b8', '#509848'];
     const word2Colors = ['#a038d0', '#f8d038', '#f85820', '#38a8b8'];
 
-    // 1. Vẽ dòng chữ "FLAPPY"
     let word1 = ['F','L','A','P','P','Y'];
     let startX1 = cx - 135;
     let currX1 = startX1;
@@ -840,15 +809,12 @@ function drawRetroPixelTitle(cx, topY) {
                     let bx = currX1 + c * p;
                     let by = topY + r * p;
 
-                    // Bóng đổ 3D viền đen đậm
                     ctx.fillStyle = '#000000';
                     ctx.fillRect(bx + 4, by + 4, p, p);
 
-                    // Mặt khối màu chữ tươi sáng
                     ctx.fillStyle = color;
                     ctx.fillRect(bx, by, p, p);
 
-                    // Viền nét đậm sắc sảo
                     ctx.strokeStyle = '#2b221e';
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(bx, by, p, p);
@@ -858,7 +824,6 @@ function drawRetroPixelTitle(cx, topY) {
         currX1 += (grid[0].length + 1) * p;
     });
 
-    // 2. Vẽ dòng chữ "BIRD"
     let word2 = ['B','I','R','D'];
     let startX2 = cx - 80;
     let currX2 = startX2;
@@ -874,15 +839,12 @@ function drawRetroPixelTitle(cx, topY) {
                     let bx = currX2 + c * p;
                     let by = topY2 + r * p;
 
-                    // Bóng đổ 3D viền đen đậm
                     ctx.fillStyle = '#000000';
                     ctx.fillRect(bx + 4, by + 4, p, p);
 
-                    // Mặt khối màu chữ tươi sáng
                     ctx.fillStyle = color;
                     ctx.fillRect(bx, by, p, p);
 
-                    // Viền nét đậm sắc sảo
                     ctx.strokeStyle = '#2b221e';
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(bx, by, p, p);
@@ -897,12 +859,10 @@ function drawRetroPixelTitle(cx, topY) {
 
 function drawMainMenu() {
     let titleX = canvas.width / 2;
-    
-    // Vẽ Tiêu Đề Flappy Bird Kiểu 3D Pixel Rực Rỡ Chuẩn Mẫu Hình Ảnh
     drawRetroPixelTitle(titleX, 90);
 
     let floatY = 250 + Math.sin(frames * 0.08) * 8;
-    drawPixelBird(canvas.width / 2, floatY, selectedSkin, 3.2);
+    drawClassicPixelBird(canvas.width / 2, floatY, selectedSkin, 3.2);
 
     drawMenuButton(menuPlayBtn, true);
     drawMenuButton(menuCharBtn, false);
@@ -971,7 +931,7 @@ function drawCharacterMenu() {
             ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, boxW, boxH);
         }
 
-        drawPixelBird(bx + boxW / 2, by + 32, i, 2.0);
+        drawClassicPixelBird(bx + boxW / 2, by + 32, i, 2.0);
 
         ctx.fillStyle = isSelected ? '#d49b00' : '#457a82';
         ctx.fillRect(bx + 8, by + 65, boxW - 16, 16);
