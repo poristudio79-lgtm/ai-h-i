@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Basketball Skin", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Piranha Plant Direction Fix", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -92,7 +92,7 @@ const CHARACTERS = [
     { id: 3, name: 'KHON', color: '#8838d0', effect: 'Hỏa diệm Bùng' },
     { id: 4, name: 'BINH', color: '#38a8b8', effect: 'Bong bóng Nước' },
     { id: 5, name: 'NARWHAL', color: '#20b2aa', effect: 'Băng giá Tuyết' },
-    { id: 6, name: 'BASKETBALL', color: '#f86820', effect: 'Đuôi Lửa Cháy' } // Skin mới quả bóng rổ
+    { id: 6, name: 'BASKETBALL', color: '#f86820', effect: 'Đuôi Lửa Cháy' }
 ];
 
 const menuPlayBtn = { x: 75, y: 410, w: 145, h: 90 };
@@ -106,7 +106,7 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-// --- HÀM VẼ NHÂN VẬT (BAO GỒM SKIN QUẢ BÓNG RỔ) ---
+// --- HÀM VẼ NHÂN VẬT ---
 function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.save();
     ctx.translate(x, y);
@@ -114,8 +114,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     const p = scale;
 
     if (skinId === 6) {
-        // --- TẠO HÌNH QUẢ BÓNG RỔ (BASKETBALL BIRD) ---
-        // Viền bóng
         ctx.fillStyle = '#2b1008';
         ctx.fillRect(-5*p, -6*p, 8*p, 1*p);
         ctx.fillRect(-8*p, -5*p, 12*p, 1*p);
@@ -125,7 +123,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
         ctx.fillRect(-8*p, 4*p, 15*p, 2*p);
         ctx.fillRect(-5*p, 6*p, 9*p, 1*p);
 
-        // Màu da cam quả bóng rổ
         ctx.fillStyle = '#f87820';
         ctx.fillRect(-4*p, -5*p, 6*p, 1*p);
         ctx.fillRect(-7*p, -4*p, 9*p, 1*p);
@@ -133,12 +130,10 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
         ctx.fillRect(-7*p, 2*p, 11*p, 2*p);
         ctx.fillRect(-6*p, 4*p, 9*p, 2*p);
 
-        // Các đường sọc đặc trưng của quả bóng rổ
         ctx.fillStyle = '#2b1008';
-        ctx.fillRect(-2*p, -3*p, 1*p, 8*p); // Sọc dọc giữa
-        ctx.fillRect(-8*p, -1*p, 13*p, 1*p); // Sọc ngang giữa
+        ctx.fillRect(-2*p, -3*p, 1*p, 8*p);
+        ctx.fillRect(-8*p, -1*p, 13*p, 1*p);
 
-        // Mắt chim góc phải
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(1*p, -5*p, 6*p, 6*p);
         ctx.fillRect(0*p, -4*p, 8*p, 4*p);
@@ -152,7 +147,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(5*p, -2*p, 1*p, 1*p);
 
-        // Mỏ chim màu cam đậm
         ctx.fillStyle = '#2b1008';
         ctx.fillRect(2*p, 0*p, 8*p, 5*p);
         ctx.fillStyle = '#d84810';
@@ -239,17 +233,15 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.restore();
 }
 
-// --- HIỆU ỨNG ĐUỘC QUYỀN (BAO GỒM ĐUÔI LỬA CHO QUẢ BÓNG RỔ) ---
+// --- HIỆU ỨNG ĐẶC BIỆT NHÂN VẬT ---
 function drawSkinEffects(x, y, skinId) {
     ctx.save();
     let time = frames * 0.12;
 
     if (skinId === 6) {
-        // Hiệu ứng đuôi lửa cháy rực rỡ đằng sau quả bóng rổ giống trong hình minh họa
         let flameW = 28 + Math.sin(frames * 0.4) * 8;
         let flameH = 16 + Math.cos(frames * 0.3) * 5;
 
-        // Lớp lửa ngoài cùng (Màu đỏ cam rực)
         ctx.fillStyle = 'rgba(248, 56, 16, 0.85)';
         ctx.beginPath();
         ctx.moveTo(x - 12, y);
@@ -259,7 +251,6 @@ function drawSkinEffects(x, y, skinId) {
         ctx.closePath();
         ctx.fill();
 
-        // Lớp lửa trong (Màu vàng sáng)
         ctx.fillStyle = 'rgba(255, 200, 0, 0.95)';
         ctx.beginPath();
         ctx.moveTo(x - 10, y);
@@ -269,7 +260,6 @@ function drawSkinEffects(x, y, skinId) {
         ctx.closePath();
         ctx.fill();
 
-        // Đốm tàn lửa bay phía sau
         let sparkX = x - 25 - ((frames * 3) % 45);
         let sparkY = y + Math.sin(time * 2) * 12;
         ctx.fillStyle = '#ffffff';
@@ -437,11 +427,12 @@ const pipes = {
                 let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
                 let plantX = p.x + this.width / 2;
                 
-                let plantTopHeadY = p.top - plantHeight;
+                // Cắt va chạm chính xác theo đầu cây ăn thịt đã đổi hướng
+                let plantTopHeadY = p.top + plantHeight;
                 if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantTopHeadY) < 22) {
                     triggerGameOver();
                 }
-                let plantBottomHeadY = p.bottom + plantHeight;
+                let plantBottomHeadY = p.bottom - plantHeight;
                 if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantBottomHeadY) < 22) {
                     triggerGameOver();
                 }
@@ -466,13 +457,17 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ CÂY ĂN THỊT ---
+// --- HÀM VẼ CÂY ĂN THỊT ĐÃ ĐƯỢC CHỈNH HƯỚNG QUAY MIỆNG RA NGOÀI ---
 function drawPiranhaPlant(x, rimY, isTop) {
     ctx.save();
     let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
     let px = x + 28;
-    let headY = isTop ? (rimY - plantHeight) : (rimY + plantHeight);
+    
+    // isTop: Cống trên -> Đầu thò xuống dưới (+ plantHeight)
+    // !isTop: Cống dưới -> Đầu thò ngoi lên trên (- plantHeight)
+    let headY = isTop ? (rimY + plantHeight) : (rimY - plantHeight);
 
+    // 1. Thân cây xanh lá
     ctx.fillStyle = '#229822';
     ctx.strokeStyle = '#0e420e';
     ctx.lineWidth = 2.5;
@@ -484,6 +479,7 @@ function drawPiranhaPlant(x, rimY, isTop) {
         ctx.strokeRect(px - 5, rimY, 10, -plantHeight);
     }
 
+    // 2. Lá cây hai bên
     ctx.fillStyle = '#32b832';
     ctx.strokeStyle = '#0e420e';
     ctx.lineWidth = 2.5;
@@ -497,6 +493,7 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.ellipse(px + 16, leafY, 14, 7, 0.4, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
 
+    // 3. Đầu đỏ tròn
     ctx.fillStyle = '#e82020';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 3.5;
@@ -505,40 +502,51 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.fill();
     ctx.stroke();
 
+    // 4. Các chấm trắng trên đầu
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 2;
     
-    ctx.beginPath(); ctx.arc(px - 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.arc(px + 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.beginPath(); ctx.arc(px, headY + 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    if (isTop) {
+        ctx.beginPath(); ctx.arc(px - 11, headY + 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px + 11, headY + 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px, headY - 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    } else {
+        ctx.beginPath(); ctx.arc(px - 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px + 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(px, headY + 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    }
 
+    // 5. Hàm răng nhọn quay đối diện với đường chim
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 3;
     
     ctx.beginPath();
     if (isTop) {
-        ctx.moveTo(px - 15, headY - 14);
-        ctx.lineTo(px, headY + 3);
-        ctx.lineTo(px + 15, headY - 14);
-        ctx.closePath();
-    } else {
+        // Cống trên -> Miệng răng nhọn chỉa xuống dưới
         ctx.moveTo(px - 15, headY + 14);
         ctx.lineTo(px, headY - 3);
         ctx.lineTo(px + 15, headY + 14);
+        ctx.closePath();
+    } else {
+        // Cống dưới -> Miệng răng nhọn chỉa hướng lên trên
+        ctx.moveTo(px - 15, headY - 14);
+        ctx.lineTo(px, headY + 3);
+        ctx.lineTo(px + 15, headY - 14);
         ctx.closePath();
     }
     ctx.fill();
     ctx.stroke();
 
+    // Vệt màu họng cây
     ctx.fillStyle = '#e82020';
     if (isTop) {
+        ctx.fillRect(px - 6, headY - 4, 3, 5);
+        ctx.fillRect(px + 3, headY - 4, 3, 5);
+    } else {
         ctx.fillRect(px - 6, headY - 9, 3, 5);
         ctx.fillRect(px + 3, headY - 9, 3, 5);
-    } else {
-        ctx.fillRect(px - 6, headY + 4, 3, 5);
-        ctx.fillRect(px + 3, headY + 4, 3, 5);
     }
 
     ctx.restore();
