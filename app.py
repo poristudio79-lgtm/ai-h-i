@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Slim Bird Shapes", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Basketball Skin", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -91,7 +91,8 @@ const CHARACTERS = [
     { id: 2, name: 'HOI BINK', color: '#509848', effect: 'Lá mầm Xanh' },
     { id: 3, name: 'KHON', color: '#8838d0', effect: 'Hỏa diệm Bùng' },
     { id: 4, name: 'BINH', color: '#38a8b8', effect: 'Bong bóng Nước' },
-    { id: 5, name: 'NARWHAL', color: '#20b2aa', effect: 'Băng giá Tuyết' }
+    { id: 5, name: 'NARWHAL', color: '#20b2aa', effect: 'Băng giá Tuyết' },
+    { id: 6, name: 'BASKETBALL', color: '#f86820', effect: 'Đuôi Lửa Cháy' } // Skin mới quả bóng rổ
 ];
 
 const menuPlayBtn = { x: 75, y: 410, w: 145, h: 90 };
@@ -105,12 +106,65 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-// --- HÀM VẼ CON CHIM FLAPPY BIRD THÂN GỌN GÀNG (SLIM & BALANCED BIRD) ---
+// --- HÀM VẼ NHÂN VẬT (BAO GỒM SKIN QUẢ BÓNG RỔ) ---
 function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(rotation);
     const p = scale;
+
+    if (skinId === 6) {
+        // --- TẠO HÌNH QUẢ BÓNG RỔ (BASKETBALL BIRD) ---
+        // Viền bóng
+        ctx.fillStyle = '#2b1008';
+        ctx.fillRect(-5*p, -6*p, 8*p, 1*p);
+        ctx.fillRect(-8*p, -5*p, 12*p, 1*p);
+        ctx.fillRect(-9*p, -4*p, 15*p, 1*p);
+        ctx.fillRect(-10*p, -3*p, 18*p, 5*p);
+        ctx.fillRect(-9*p, 2*p, 17*p, 2*p);
+        ctx.fillRect(-8*p, 4*p, 15*p, 2*p);
+        ctx.fillRect(-5*p, 6*p, 9*p, 1*p);
+
+        // Màu da cam quả bóng rổ
+        ctx.fillStyle = '#f87820';
+        ctx.fillRect(-4*p, -5*p, 6*p, 1*p);
+        ctx.fillRect(-7*p, -4*p, 9*p, 1*p);
+        ctx.fillRect(-8*p, -3*p, 12*p, 5*p);
+        ctx.fillRect(-7*p, 2*p, 11*p, 2*p);
+        ctx.fillRect(-6*p, 4*p, 9*p, 2*p);
+
+        // Các đường sọc đặc trưng của quả bóng rổ
+        ctx.fillStyle = '#2b1008';
+        ctx.fillRect(-2*p, -3*p, 1*p, 8*p); // Sọc dọc giữa
+        ctx.fillRect(-8*p, -1*p, 13*p, 1*p); // Sọc ngang giữa
+
+        // Mắt chim góc phải
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(1*p, -5*p, 6*p, 6*p);
+        ctx.fillRect(0*p, -4*p, 8*p, 4*p);
+        ctx.fillStyle = '#2b1008';
+        ctx.fillRect(1*p, -5*p, 6*p, 1*p);
+        ctx.fillRect(7*p, -4*p, 1*p, 4*p);
+        ctx.fillRect(1*p, 1*p, 6*p, 1*p);
+        ctx.fillRect(0*p, -4*p, 1*p, 4*p);
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(4*p, -3*p, 2*p, 4*p);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(5*p, -2*p, 1*p, 1*p);
+
+        // Mỏ chim màu cam đậm
+        ctx.fillStyle = '#2b1008';
+        ctx.fillRect(2*p, 0*p, 8*p, 5*p);
+        ctx.fillStyle = '#d84810';
+        ctx.fillRect(3*p, 1*p, 6*p, 3*p);
+        ctx.fillStyle = '#f8a020';
+        ctx.fillRect(3*p, 1*p, 6*p, 1*p);
+        ctx.fillStyle = '#2b1008';
+        ctx.fillRect(2*p, 2*p, 7*p, 1*p);
+
+        ctx.restore();
+        return;
+    }
 
     const skinThemes = [
         { body: '#e82878', belly: '#f8a0c8', wing: '#ffffff', beak: '#f85820', outline: '#2b1018' },
@@ -123,7 +177,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
 
     let t = skinThemes[skinId] || skinThemes[1];
 
-    // 1. VIỀN OUTLINE THÂN GỌN HƠN
     ctx.fillStyle = t.outline;
     ctx.fillRect(-5*p, -6*p, 8*p, 1*p);
     ctx.fillRect(-8*p, -5*p, 12*p, 1*p);
@@ -133,7 +186,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.fillRect(-8*p, 4*p, 15*p, 2*p);
     ctx.fillRect(-5*p, 6*p, 9*p, 1*p);
 
-    // 2. MÀU THÂN (BODY - ĐÃ THU GỌN BỀ NGANG)
     ctx.fillStyle = t.body;
     ctx.fillRect(-4*p, -5*p, 6*p, 1*p);
     ctx.fillRect(-7*p, -4*p, 9*p, 1*p);
@@ -141,12 +193,10 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.fillRect(-7*p, 2*p, 11*p, 2*p);
     ctx.fillRect(-6*p, 4*p, 9*p, 2*p);
 
-    // 3. BỤNG CHIM SÁNG MÀU (BELLY GỌN)
     ctx.fillStyle = t.belly;
     ctx.fillRect(-5*p, 3*p, 7*p, 2*p);
     ctx.fillRect(-3*p, 5*p, 4*p, 1*p);
 
-    // 4. MẮT TO TRÒN TRẮNG (EYE)
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(1*p, -5*p, 6*p, 6*p);
     ctx.fillRect(0*p, -4*p, 8*p, 4*p);
@@ -157,13 +207,11 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.fillRect(1*p, 1*p, 6*p, 1*p);
     ctx.fillRect(0*p, -4*p, 1*p, 4*p);
 
-    // Tròng đen mắt
     ctx.fillStyle = '#000000';
     ctx.fillRect(4*p, -3*p, 2*p, 4*p);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(5*p, -2*p, 1*p, 1*p);
 
-    // 5. CÁNH CHIM GỌN GÀNG (WING)
     ctx.fillStyle = t.outline;
     ctx.fillRect(-8*p, -1*p, 5*p, 4*p);
     ctx.fillStyle = t.wing;
@@ -171,7 +219,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.fillStyle = '#f8ea88';
     ctx.fillRect(-6*p, 1*p, 3*p, 2*p);
 
-    // 6. MỎ DẦY CÂN ĐỐI (BEAK)
     ctx.fillStyle = t.outline;
     ctx.fillRect(2*p, 0*p, 8*p, 5*p);
 
@@ -180,11 +227,9 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.fillStyle = '#f8a020';
     ctx.fillRect(3*p, 1*p, 6*p, 1*p);
 
-    // Vạch viền mỏ
     ctx.fillStyle = t.outline;
     ctx.fillRect(2*p, 2*p, 7*p, 1*p);
 
-    // Thêm sừng đặc trưng cho Skin Narwhal
     if (skinId === 5) {
         ctx.fillStyle = '#ffffff'; ctx.strokeStyle = t.outline; ctx.lineWidth = 1.5;
         ctx.fillRect(2*p, -9*p, 2*p, 4*p);
@@ -194,10 +239,47 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.restore();
 }
 
-// --- HIỆU ỨNG ĐỘC QUYỀN RÕ NÉT CHO TỪNG SKIN ---
+// --- HIỆU ỨNG ĐUỘC QUYỀN (BAO GỒM ĐUÔI LỬA CHO QUẢ BÓNG RỔ) ---
 function drawSkinEffects(x, y, skinId) {
     ctx.save();
     let time = frames * 0.12;
+
+    if (skinId === 6) {
+        // Hiệu ứng đuôi lửa cháy rực rỡ đằng sau quả bóng rổ giống trong hình minh họa
+        let flameW = 28 + Math.sin(frames * 0.4) * 8;
+        let flameH = 16 + Math.cos(frames * 0.3) * 5;
+
+        // Lớp lửa ngoài cùng (Màu đỏ cam rực)
+        ctx.fillStyle = 'rgba(248, 56, 16, 0.85)';
+        ctx.beginPath();
+        ctx.moveTo(x - 12, y);
+        ctx.lineTo(x - 35 - flameW, y - flameH);
+        ctx.lineTo(x - 28, y);
+        ctx.lineTo(x - 35 - flameW, y + flameH);
+        ctx.closePath();
+        ctx.fill();
+
+        // Lớp lửa trong (Màu vàng sáng)
+        ctx.fillStyle = 'rgba(255, 200, 0, 0.95)';
+        ctx.beginPath();
+        ctx.moveTo(x - 10, y);
+        ctx.lineTo(x - 22 - flameW * 0.7, y - flameH * 0.5);
+        ctx.lineTo(x - 18, y);
+        ctx.lineTo(x - 22 - flameW * 0.7, y + flameH * 0.5);
+        ctx.closePath();
+        ctx.fill();
+
+        // Đốm tàn lửa bay phía sau
+        let sparkX = x - 25 - ((frames * 3) % 45);
+        let sparkY = y + Math.sin(time * 2) * 12;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(sparkX, sparkY, 4, 4);
+        ctx.fillStyle = '#ff4500';
+        ctx.fillRect(sparkX + 2, sparkY + 2, 3, 3);
+        
+        ctx.restore();
+        return;
+    }
 
     if (skinId === 0) {
         ctx.strokeStyle = 'rgba(255, 60, 150, 0.8)';
@@ -900,17 +982,17 @@ function drawDiffButton(btn, label, color) {
 }
 
 function drawCharacterMenu() {
-    let panelX = 30, panelY = 30, panelW = 420, panelH = 580;
+    let panelX = 20, panelY = 20, panelW = 440, panelH = 600;
     ctx.fillStyle = '#bdebf2'; ctx.fillRect(panelX, panelY, panelW, panelH);
     ctx.strokeStyle = '#2b484f'; ctx.lineWidth = 6; ctx.strokeRect(panelX, panelY, panelW, panelH);
 
     ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.strokeRect(panelX + 4, panelY + 4, panelW - 8, panelH - 8);
 
-    ctx.font = '900 32px "Courier New", sans-serif';
+    ctx.font = '900 28px "Courier New", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#3a2050'; ctx.fillText('HIỆU ỨNG NHÂN VẬT', canvas.width / 2 + 2, panelY + 45);
+    ctx.fillStyle = '#3a2050'; ctx.fillText('HIỆU ỨNG NHÂN VẬT', canvas.width / 2 + 1, panelY + 38);
 
-    const startGridX = 55, startGridY = 85, boxW = 110, boxH = 135, gapX = 20, gapY = 15;
+    const startGridX = 40, startGridY = 70, boxW = 120, boxH = 115, gapX = 20, gapY = 12;
     CHARACTERS.forEach((char, i) => {
         let col = i % 3;
         let row = Math.floor(i / 3);
@@ -920,37 +1002,37 @@ function drawCharacterMenu() {
 
         ctx.fillStyle = '#a6e3ed'; ctx.fillRect(bx, by, boxW, boxH);
         if (isSelected) {
-            ctx.strokeStyle = '#d49b00'; ctx.lineWidth = 5; ctx.strokeRect(bx - 2, by - 2, boxW + 4, boxH + 4);
+            ctx.strokeStyle = '#d49b00'; ctx.lineWidth = 4; ctx.strokeRect(bx - 2, by - 2, boxW + 4, boxH + 4);
             ctx.strokeStyle = '#fff7b2'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, boxW, boxH);
         } else {
             ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, boxW, boxH);
         }
 
-        drawClassicPixelBird(bx + boxW / 2, by + 32, i, 2.0);
+        drawClassicPixelBird(bx + boxW / 2, by + 26, i, 1.7);
 
         ctx.fillStyle = isSelected ? '#d49b00' : '#457a82';
-        ctx.fillRect(bx + 8, by + 65, boxW - 16, 16);
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.strokeRect(bx + 8, by + 65, boxW - 16, 16);
+        ctx.fillRect(bx + 6, by + 54, boxW - 12, 14);
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.strokeRect(bx + 6, by + 54, boxW - 12, 14);
 
-        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 10px "Courier New"';
-        ctx.fillText(char.name, bx + boxW / 2, by + 77);
+        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 9px "Courier New"';
+        ctx.fillText(char.name, bx + boxW / 2, by + 64);
 
         ctx.fillStyle = '#222222'; ctx.font = 'bold 8px "Courier New"';
-        ctx.fillText(char.effect, bx + boxW / 2, by + 95);
+        ctx.fillText(char.effect, bx + boxW / 2, by + 78);
 
         ctx.fillStyle = isSelected ? '#f8b000' : '#e0f8f8';
-        ctx.fillRect(bx + 15, by + 104, boxW - 30, 20);
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.strokeRect(bx + 15, by + 104, boxW - 30, 20);
+        ctx.fillRect(bx + 12, by + 86, boxW - 24, 18);
+        ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.strokeRect(bx + 12, by + 86, boxW - 24, 18);
 
         ctx.fillStyle = isSelected ? '#ffffff' : '#000000';
-        ctx.font = 'bold 10px "Courier New"';
-        ctx.fillText('CHỌN', bx + boxW / 2, by + 118);
+        ctx.font = 'bold 9px "Courier New"';
+        ctx.fillText('CHỌN', bx + boxW / 2, by + 98);
     });
 
-    ctx.fillStyle = '#75cb27'; ctx.fillRect(140, 550, 200, 38);
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(140, 550, 200, 38);
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 16px "Courier New"';
-    ctx.fillText('QUAY LẠI', canvas.width / 2, 574);
+    ctx.fillStyle = '#75cb27'; ctx.fillRect(140, 560, 200, 32);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(140, 560, 200, 32);
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New"';
+    ctx.fillText('QUAY LẠI', canvas.width / 2, 581);
 }
 
 function drawPixelMedal(cx, cy, currentScore) {
@@ -1169,7 +1251,7 @@ function handleInteraction(clientX, clientY) {
         }
     }
     else if (gameState === 'CHARACTERS') {
-        const startGridX = 55, startGridY = 85, boxW = 110, boxH = 135, gapX = 20, gapY = 15;
+        const startGridX = 40, startGridY = 70, boxW = 120, boxH = 115, gapX = 20, gapY = 12;
         CHARACTERS.forEach((char, i) => {
             let col = i % 3; let row = Math.floor(i / 3);
             let bx = startGridX + col * (boxW + gapX);
@@ -1181,7 +1263,7 @@ function handleInteraction(clientX, clientY) {
             }
         });
 
-        if (clickX >= 140 && clickX <= 340 && clickY >= 550 && clickY <= 588) {
+        if (clickX >= 140 && clickX <= 340 && clickY >= 560 && clickY <= 592) {
             gameState = 'START';
             playSound('score');
         }
