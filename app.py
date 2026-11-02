@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - 8-Bit Chiptune Music", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Full Features", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -47,7 +47,6 @@ const audioCtx = new AudioContext();
 let isMusicPlaying = false;
 let musicInterval = null;
 
-// Giai điệu nhạc nền 8-bit phong cách Flappy Bird (Nốt nhạc & thời lượng)
 const melody = [
     {n: 523.25, d: 0.15}, {n: 659.25, d: 0.15}, {n: 783.99, d: 0.15}, {n: 1046.50, d: 0.3},
     {n: 783.99, d: 0.15}, {n: 1046.50, d: 0.4}, {n: 659.25, d: 0.3}, {n: 523.25, d: 0.3},
@@ -65,7 +64,7 @@ function playChiptuneNote() {
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'square'; // Âm thanh vuông đặc trưng máy game cổ điển
+    osc.type = 'square';
     osc.frequency.setValueAtTime(note.n, audioCtx.currentTime);
 
     gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
@@ -85,13 +84,12 @@ function toggleMusic() {
     isMusicPlaying = !isMusicPlaying;
     if (isMusicPlaying) {
         melodyIndex = 0;
-        musicInterval = setInterval(playChiptuneNote, 220); // Tốc độ nhịp điệu
+        musicInterval = setInterval(playChiptuneNote, 220);
     } else {
         clearInterval(musicInterval);
     }
 }
 
-// Hiệu ứng âm thanh tương tác trong game (Nhảy, Điểm, Thua)
 function playSound(type) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
@@ -154,7 +152,6 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-// Nút Bật/Tắt nhạc ở góc trên bên phải
 const musicBtn = { x: 410, y: 15, w: 55, h: 32 };
 
 // --- HÀM VẼ NHÂN VẬT ---
@@ -284,7 +281,6 @@ function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
     ctx.restore();
 }
 
-// --- HIỆU ỨNG ĐẶC BIỆT NHÂN VẬT ---
 function drawSkinEffects(x, y, skinId) {
     ctx.save();
     let time = frames * 0.12;
@@ -403,7 +399,6 @@ function drawSkinEffects(x, y, skinId) {
     ctx.restore();
 }
 
-// --- ĐỐI TƯỢNG CHIM ---
 const bird = {
     x: 90, y: 250, radius: 13, gravity: 0.28, jumpForce: -5.2, velocity: 0,
     draw() {
@@ -424,7 +419,6 @@ const bird = {
     reset() { this.y = 250; this.velocity = 0; }
 };
 
-// --- QUẢN LÝ ỐNG CỐNG ---
 const pipes = {
     items: [], gap: 130, width: 56, speed: 2.2,
     
@@ -488,7 +482,44 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ GĂNG TAY TÍM ---
+// --- HÀM VẼ HÀNG RĂNG NHỌN TẠI MIỆNG CỐNG (CHO MAP KHÓ) ---
+function drawPipeTeeth(x, rimY, width, isTop) {
+    ctx.save();
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#280808';
+    ctx.lineWidth = 2;
+
+    const toothWidth = 8;
+    const toothHeight = 9;
+
+    if (isTop) {
+        let bottomEdgeY = rimY + 28;
+        for (let i = 2; i < width + 6 - toothWidth; i += toothWidth + 2) {
+            let tx = x - 3 + i;
+            ctx.beginPath();
+            ctx.moveTo(tx, bottomEdgeY);
+            ctx.lineTo(tx + toothWidth / 2, bottomEdgeY + toothHeight);
+            ctx.lineTo(tx + toothWidth, bottomEdgeY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+    } else {
+        let topEdgeY = rimY;
+        for (let i = 2; i < width + 6 - toothWidth; i += toothWidth + 2) {
+            let tx = x - 3 + i;
+            ctx.beginPath();
+            ctx.moveTo(tx, topEdgeY);
+            ctx.lineTo(tx + toothWidth / 2, topEdgeY - toothHeight);
+            ctx.lineTo(tx + toothWidth, topEdgeY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
+    ctx.restore();
+}
+
 function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.save();
     const colBorder = '#281038';
@@ -564,7 +595,6 @@ function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.restore();
 }
 
-// --- HÀM VẼ ĐÔI MẮT QUỶ TRÊN NẮP CỐNG KHÓ ---
 function drawHardPipeEyes(x, rimY, rW, isTop) {
     ctx.save();
     let eyeCenterX1 = x + rW * 0.3;
@@ -585,7 +615,6 @@ function drawHardPipeEyes(x, rimY, rW, isTop) {
     ctx.restore();
 }
 
-// --- HỆ THỐNG VẼ CỐNG ---
 function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
     ctx.save();
 
@@ -675,6 +704,7 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawHardPipeEyes(rX, rimY, rW, true);
+            drawPipeTeeth(x, rimY, width, true); // ĐÃ KHÔI PHỤC HÀNG RĂNG NHỌN Ở MAP KHÓ
         } else {
             let rimY = y;
             let bodyY = y + 28;
@@ -693,6 +723,7 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawHardPipeEyes(rX, rimY, rW, false);
+            drawPipeTeeth(x, rimY, width, false); // ĐÃ KHÔI PHỤC HÀNG RĂNG NHỌN Ở MAP KHÓ
         }
     }
     ctx.restore();
@@ -764,7 +795,6 @@ function drawMenuButton(btn, isPlayBtn) {
     }
 }
 
-// --- VẼ NÚT BẬT / TẮT NHẠC GÓC TRÊN ---
 function drawMusicButton() {
     ctx.save();
     ctx.fillStyle = isMusicPlaying ? '#54cb37' : '#e83838';
@@ -783,7 +813,6 @@ function drawMusicButton() {
     ctx.restore();
 }
 
-// --- HÀM VẼ TIÊU ĐỀ 3D PIXEL RỰC RỠ ---
 function drawRetroPixelTitle(cx, topY) {
     ctx.save();
     const p = 5;
@@ -1136,13 +1165,11 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-// --- TƯƠNG TÁC ĐIỀU KHIỂN ---
 function handleInteraction(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
 
-    // Kiểm tra bấm nút Bật/Tắt Nhạc
     if (clickX >= musicBtn.x && clickX <= musicBtn.x + musicBtn.w &&
         clickY >= musicBtn.y && clickY <= musicBtn.y + musicBtn.h) {
         toggleMusic();
