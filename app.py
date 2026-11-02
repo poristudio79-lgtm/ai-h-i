@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Piranha Plant Direction Fix", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Clean Hard Map & Teeth Pipe", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -427,7 +427,6 @@ const pipes = {
                 let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
                 let plantX = p.x + this.width / 2;
                 
-                // Cắt va chạm chính xác theo đầu cây ăn thịt đã đổi hướng
                 let plantTopHeadY = p.top + plantHeight;
                 if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantTopHeadY) < 22) {
                     triggerGameOver();
@@ -457,17 +456,13 @@ const pipes = {
     }
 };
 
-// --- HÀM VẼ CÂY ĂN THỊT ĐÃ ĐƯỢC CHỈNH HƯỚNG QUAY MIỆNG RA NGOÀI ---
+// --- HÀM VẼ CÂY ĂN THỊT ---
 function drawPiranhaPlant(x, rimY, isTop) {
     ctx.save();
     let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
     let px = x + 28;
-    
-    // isTop: Cống trên -> Đầu thò xuống dưới (+ plantHeight)
-    // !isTop: Cống dưới -> Đầu thò ngoi lên trên (- plantHeight)
     let headY = isTop ? (rimY + plantHeight) : (rimY - plantHeight);
 
-    // 1. Thân cây xanh lá
     ctx.fillStyle = '#229822';
     ctx.strokeStyle = '#0e420e';
     ctx.lineWidth = 2.5;
@@ -479,7 +474,6 @@ function drawPiranhaPlant(x, rimY, isTop) {
         ctx.strokeRect(px - 5, rimY, 10, -plantHeight);
     }
 
-    // 2. Lá cây hai bên
     ctx.fillStyle = '#32b832';
     ctx.strokeStyle = '#0e420e';
     ctx.lineWidth = 2.5;
@@ -493,7 +487,6 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.ellipse(px + 16, leafY, 14, 7, 0.4, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
 
-    // 3. Đầu đỏ tròn
     ctx.fillStyle = '#e82020';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 3.5;
@@ -502,7 +495,6 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.fill();
     ctx.stroke();
 
-    // 4. Các chấm trắng trên đầu
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 2;
@@ -517,20 +509,17 @@ function drawPiranhaPlant(x, rimY, isTop) {
         ctx.beginPath(); ctx.arc(px, headY + 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     }
 
-    // 5. Hàm răng nhọn quay đối diện với đường chim
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#220000';
     ctx.lineWidth = 3;
     
     ctx.beginPath();
     if (isTop) {
-        // Cống trên -> Miệng răng nhọn chỉa xuống dưới
         ctx.moveTo(px - 15, headY + 14);
         ctx.lineTo(px, headY - 3);
         ctx.lineTo(px + 15, headY + 14);
         ctx.closePath();
     } else {
-        // Cống dưới -> Miệng răng nhọn chỉa hướng lên trên
         ctx.moveTo(px - 15, headY - 14);
         ctx.lineTo(px, headY + 3);
         ctx.lineTo(px + 15, headY - 14);
@@ -539,7 +528,6 @@ function drawPiranhaPlant(x, rimY, isTop) {
     ctx.fill();
     ctx.stroke();
 
-    // Vệt màu họng cây
     ctx.fillStyle = '#e82020';
     if (isTop) {
         ctx.fillRect(px - 6, headY - 4, 3, 5);
@@ -549,6 +537,44 @@ function drawPiranhaPlant(x, rimY, isTop) {
         ctx.fillRect(px + 3, headY - 9, 3, 5);
     }
 
+    ctx.restore();
+}
+
+// --- HÀM VẼ HÀNG RĂNG NHỌN TẠI MIỆNG ỐNG CỐNG ---
+function drawPipeTeeth(x, rimY, width, isTop) {
+    ctx.save();
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#280808';
+    ctx.lineWidth = 2;
+
+    const toothWidth = 8;
+    const toothHeight = 9;
+
+    if (isTop) {
+        let bottomEdgeY = rimY + 28;
+        for (let i = 2; i < width + 6 - toothWidth; i += toothWidth + 2) {
+            let tx = x - 3 + i;
+            ctx.beginPath();
+            ctx.moveTo(tx, bottomEdgeY);
+            ctx.lineTo(tx + toothWidth / 2, bottomEdgeY + toothHeight);
+            ctx.lineTo(tx + toothWidth, bottomEdgeY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+    } else {
+        let topEdgeY = rimY;
+        for (let i = 2; i < width + 6 - toothWidth; i += toothWidth + 2) {
+            let tx = x - 3 + i;
+            ctx.beginPath();
+            ctx.moveTo(tx, topEdgeY);
+            ctx.lineTo(tx + toothWidth / 2, topEdgeY - toothHeight);
+            ctx.lineTo(tx + toothWidth, topEdgeY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
     ctx.restore();
 }
 
@@ -628,12 +654,12 @@ function drawPurpleFistGlove(x, y, width, isTop) {
     ctx.restore();
 }
 
-// --- HÀM VẼ ĐÔI MẮT RỰC LỬA TRÊN NẮP CỐNG ---
+// --- HÀM VẼ ĐÔI MẮT QUỶ TRÊN NẮP CỐNG KHÓ ---
 function drawHardPipeEyes(x, rimY, rW, isTop) {
     ctx.save();
     let eyeCenterX1 = x + rW * 0.3;
     let eyeCenterX2 = x + rW * 0.7;
-    let eyeY = isTop ? (rimY + 14) : (rimY + 14);
+    let eyeY = rimY + 14;
 
     ctx.fillStyle = 'rgba(255, 50, 0, 0.4)';
     ctx.beginPath(); ctx.arc(eyeCenterX1, eyeY, 7, 0, Math.PI * 2); ctx.fill();
@@ -676,6 +702,7 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
+            drawPipeTeeth(x, rimY, width, true);
             if (hasPlant) drawPiranhaPlant(x, rimY, true);
         } else {
             let rimY = y;
@@ -694,6 +721,7 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.fillStyle = colDarkGreen; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
+            drawPipeTeeth(x, rimY, width, false);
             if (hasPlant) drawPiranhaPlant(x, rimY, false);
         }
     }
@@ -713,6 +741,7 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
 
             drawPurpleFistGlove(x, bodyH + 44, width, true);
+            drawPipeTeeth(x, bodyH + 16, width, true);
             if (hasPlant) drawPiranhaPlant(x, bodyH + 44, true);
         } else {
             let bodyY = y + 44;
@@ -724,6 +753,7 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
             drawPurpleFistGlove(x, y, width, false);
+            drawPipeTeeth(x, y, width, false);
             if (hasPlant) drawPiranhaPlant(x, y, false);
         }
     }
@@ -750,16 +780,8 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-            ctx.fillStyle = '#ffffff';
-            for (let i = 0; i < width; i += 8) {
-                ctx.beginPath();
-                ctx.moveTo(x + i, rimY + 28);
-                ctx.lineTo(x + i + 4, rimY + 34);
-                ctx.lineTo(x + i + 8, rimY + 28);
-                ctx.fill();
-            }
-
             drawHardPipeEyes(rX, rimY, rW, true);
+            drawPipeTeeth(x, rimY, width, true);
             if (hasPlant) drawPiranhaPlant(x, rimY, true);
         } else {
             let rimY = y;
@@ -778,16 +800,8 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.fillStyle = colDarkRed; ctx.fillRect(rX + rW - 14, rimY, 14, 28);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
-            ctx.fillStyle = '#ffffff';
-            for (let i = 0; i < width; i += 8) {
-                ctx.beginPath();
-                ctx.moveTo(i, rimY);
-                ctx.lineTo(i + 4, rimY - 6);
-                ctx.lineTo(i + 8, rimY);
-                ctx.fill();
-            }
-
             drawHardPipeEyes(rX, rimY, rW, false);
+            drawPipeTeeth(x, rimY, width, false);
             if (hasPlant) drawPiranhaPlant(x, rimY, false);
         }
     }
