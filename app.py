@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Clean Hard Map & Teeth Pipe", layout="centered")
+st.set_page_config(page_title="Flappy Bird - No Piranha Plants", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -373,9 +373,9 @@ const bird = {
     reset() { this.y = 250; this.velocity = 0; }
 };
 
-// --- QUẢN LÝ ỐNG CỐNG & CÂY ĂN THỊT ---
+// --- QUẢN LÝ ỐNG CỐNG ---
 const pipes = {
-    items: [], gap: 130, width: 56, speed: 2.2, pipeCounter: 0,
+    items: [], gap: 130, width: 56, speed: 2.2,
     
     setDifficulty(diff) {
         currentDifficulty = diff;
@@ -393,8 +393,8 @@ const pipes = {
 
     draw() {
         this.items.forEach(p => {
-            drawPipesByTheme(p.x, 0, this.width, p.top, true, p.hasPlant, currentDifficulty);
-            drawPipesByTheme(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false, p.hasPlant, currentDifficulty);
+            drawPipesByTheme(p.x, 0, this.width, p.top, true, currentDifficulty);
+            drawPipesByTheme(p.x, p.bottom, this.width, canvas.height - 80 - p.bottom, false, currentDifficulty);
         });
     },
     update() {
@@ -402,16 +402,12 @@ const pipes = {
             let maxTop = canvas.height - 80 - this.gap - 50;
             let minTop = 50;
             let top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
-            
-            this.pipeCounter++;
-            let hasPlant = (this.pipeCounter % 4 === 0);
 
             this.items.push({ 
                 x: canvas.width, 
                 top: top, 
                 bottom: top + this.gap, 
-                passed: false,
-                hasPlant: hasPlant 
+                passed: false
             });
         }
         this.items.forEach((p, index) => {
@@ -421,20 +417,6 @@ const pipes = {
             if (bird.x + bird.radius > p.x - rimExtra && bird.x - bird.radius < p.x + this.width + rimExtra &&
                (bird.y - bird.radius < p.top || bird.y + bird.radius > p.bottom)) {
                 triggerGameOver();
-            }
-
-            if (p.hasPlant) {
-                let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
-                let plantX = p.x + this.width / 2;
-                
-                let plantTopHeadY = p.top + plantHeight;
-                if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantTopHeadY) < 22) {
-                    triggerGameOver();
-                }
-                let plantBottomHeadY = p.bottom - plantHeight;
-                if (Math.abs(bird.x - plantX) < 22 && Math.abs(bird.y - plantBottomHeadY) < 22) {
-                    triggerGameOver();
-                }
             }
 
             if (p.x + this.width < bird.x && !p.passed) {
@@ -451,94 +433,9 @@ const pipes = {
         });
     },
     reset() { 
-        this.items = []; 
-        this.pipeCounter = 0;
+        this.items = [];
     }
 };
-
-// --- HÀM VẼ CÂY ĂN THỊT ---
-function drawPiranhaPlant(x, rimY, isTop) {
-    ctx.save();
-    let plantHeight = 35 + Math.sin(frames * 0.1) * 22;
-    let px = x + 28;
-    let headY = isTop ? (rimY + plantHeight) : (rimY - plantHeight);
-
-    ctx.fillStyle = '#229822';
-    ctx.strokeStyle = '#0e420e';
-    ctx.lineWidth = 2.5;
-    if (isTop) {
-        ctx.fillRect(px - 5, rimY, 10, plantHeight);
-        ctx.strokeRect(px - 5, rimY, 10, plantHeight);
-    } else {
-        ctx.fillRect(px - 5, rimY, 10, -plantHeight);
-        ctx.strokeRect(px - 5, rimY, 10, -plantHeight);
-    }
-
-    ctx.fillStyle = '#32b832';
-    ctx.strokeStyle = '#0e420e';
-    ctx.lineWidth = 2.5;
-    let leafY = isTop ? (rimY + plantHeight * 0.5) : (rimY - plantHeight * 0.5);
-    
-    ctx.beginPath();
-    ctx.ellipse(px - 16, leafY, 14, 7, -0.4, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.ellipse(px + 16, leafY, 14, 7, 0.4, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-
-    ctx.fillStyle = '#e82020';
-    ctx.strokeStyle = '#220000';
-    ctx.lineWidth = 3.5;
-    ctx.beginPath();
-    ctx.arc(px, headY, 20, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#220000';
-    ctx.lineWidth = 2;
-    
-    if (isTop) {
-        ctx.beginPath(); ctx.arc(px - 11, headY + 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(px + 11, headY + 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(px, headY - 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    } else {
-        ctx.beginPath(); ctx.arc(px - 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(px + 11, headY - 2, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.beginPath(); ctx.arc(px, headY + 11, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    }
-
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#220000';
-    ctx.lineWidth = 3;
-    
-    ctx.beginPath();
-    if (isTop) {
-        ctx.moveTo(px - 15, headY + 14);
-        ctx.lineTo(px, headY - 3);
-        ctx.lineTo(px + 15, headY + 14);
-        ctx.closePath();
-    } else {
-        ctx.moveTo(px - 15, headY - 14);
-        ctx.lineTo(px, headY + 3);
-        ctx.lineTo(px + 15, headY - 14);
-        ctx.closePath();
-    }
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#e82020';
-    if (isTop) {
-        ctx.fillRect(px - 6, headY - 4, 3, 5);
-        ctx.fillRect(px + 3, headY - 4, 3, 5);
-    } else {
-        ctx.fillRect(px - 6, headY - 9, 3, 5);
-        ctx.fillRect(px + 3, headY - 9, 3, 5);
-    }
-
-    ctx.restore();
-}
 
 // --- HÀM VẼ HÀNG RĂNG NHỌN TẠI MIỆNG ỐNG CỐNG ---
 function drawPipeTeeth(x, rimY, width, isTop) {
@@ -676,7 +573,7 @@ function drawHardPipeEyes(x, rimY, rW, isTop) {
 }
 
 // --- HỆ THỐNG VẼ CỐNG ---
-function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
+function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
     ctx.save();
 
     if (difficulty === 'EASY') {
@@ -703,7 +600,6 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawPipeTeeth(x, rimY, width, true);
-            if (hasPlant) drawPiranhaPlant(x, rimY, true);
         } else {
             let rimY = y;
             let bodyY = y + 28;
@@ -722,7 +618,6 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(rX, rimY, rW, 28);
 
             drawPipeTeeth(x, rimY, width, false);
-            if (hasPlant) drawPiranhaPlant(x, rimY, false);
         }
     }
     else if (difficulty === 'NORMAL') {
@@ -742,7 +637,6 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
 
             drawPurpleFistGlove(x, bodyH + 44, width, true);
             drawPipeTeeth(x, bodyH + 16, width, true);
-            if (hasPlant) drawPiranhaPlant(x, bodyH + 44, true);
         } else {
             let bodyY = y + 44;
             let bodyH = Math.max(0, canvas.height - bodyY);
@@ -754,7 +648,6 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
 
             drawPurpleFistGlove(x, y, width, false);
             drawPipeTeeth(x, y, width, false);
-            if (hasPlant) drawPiranhaPlant(x, y, false);
         }
     }
     else if (difficulty === 'HARD') {
@@ -782,7 +675,6 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
 
             drawHardPipeEyes(rX, rimY, rW, true);
             drawPipeTeeth(x, rimY, width, true);
-            if (hasPlant) drawPiranhaPlant(x, rimY, true);
         } else {
             let rimY = y;
             let bodyY = y + 28;
@@ -802,7 +694,6 @@ function drawPipesByTheme(x, y, width, height, isTop, hasPlant, difficulty) {
 
             drawHardPipeEyes(rX, rimY, rW, false);
             drawPipeTeeth(x, rimY, width, false);
-            if (hasPlant) drawPiranhaPlant(x, rimY, false);
         }
     }
     ctx.restore();
