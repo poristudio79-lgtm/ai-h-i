@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Big Music Button", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Big Title", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -141,8 +141,8 @@ const CHARACTERS = [
     { id: 6, name: 'BASKETBALL', color: '#f86820', effect: 'Đuôi Lửa Cháy' }
 ];
 
-const menuPlayBtn = { x: 75, y: 410, w: 145, h: 90 };
-const menuCharBtn = { x: 260, y: 410, w: 145, h: 90 };
+const menuPlayBtn = { x: 75, y: 430, w: 145, h: 80 };
+const menuCharBtn = { x: 260, y: 430, w: 145, h: 80 };
 
 const diffEasyBtn = { x: 100, y: 220, w: 280, h: 65 };   
 const diffNormalBtn = { x: 100, y: 305, w: 280, h: 65 }; 
@@ -152,8 +152,7 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-// NÚT BẬT/TẮT NHẠC ĐÃ ĐƯỢC LÀM TO RÕ Ở GIỮA PHÍA TRÊN (Rộng 140, Cao 45)
-const musicBtn = { x: 170, y: 12, w: 140, h: 45 };
+const musicBtn = { x: 170, y: 12, w: 140, h: 42 };
 
 // --- HÀM VẼ NHÂN VẬT ---
 function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
@@ -401,7 +400,7 @@ function drawSkinEffects(x, y, skinId) {
 }
 
 const bird = {
-    x: 90, y: 250, radius: 13, gravity: 0.28, jumpForce: -5.2, velocity: 0,
+    x: 90, y: 260, radius: 13, gravity: 0.28, jumpForce: -5.2, velocity: 0,
     draw() {
         let rotation = Math.min(Math.PI / 2.5, Math.max(-Math.PI / 4, (this.velocity / 12)));
         drawSkinEffects(this.x, this.y, selectedSkin);
@@ -417,7 +416,7 @@ const bird = {
         }
     },
     jump() { this.velocity = this.jumpForce; playSound('jump'); },
-    reset() { this.y = 250; this.velocity = 0; }
+    reset() { this.y = 260; this.velocity = 0; }
 };
 
 const pipes = {
@@ -795,7 +794,6 @@ function drawMenuButton(btn, isPlayBtn) {
     }
 }
 
-// --- VẼ NÚT BẬT / TẮT NHẠC TO RÕ Ở GIỮA PHÍA TRÊN ---
 function drawMusicButton() {
     ctx.save();
     ctx.fillStyle = isMusicPlaying ? '#2ecc71' : '#e74c3c';
@@ -814,9 +812,10 @@ function drawMusicButton() {
     ctx.restore();
 }
 
+// --- HÀM VẼ TIÊU ĐỀ 3D PIXEL RẤT TO, SẮC NÉT VÀ ĐẸP MẮT ---
 function drawRetroPixelTitle(cx, topY) {
     ctx.save();
-    const p = 5;
+    const p = 6; // Tăng kích thước điểm pixel (scale lớn hơn)
 
     const LETTER_PIXELS = {
         'F': [[1,1,1,1],[1,0,0,0],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
@@ -833,8 +832,9 @@ function drawRetroPixelTitle(cx, topY) {
     const word1Colors = ['#f8d038', '#f85820', '#e82878', '#a038d0', '#38a8b8', '#509848'];
     const word2Colors = ['#a038d0', '#f8d038', '#f85820', '#38a8b8'];
 
+    // Dòng 1: FLAPPY
     let word1 = ['F','L','A','P','P','Y'];
-    let startX1 = cx - 135;
+    let startX1 = cx - 162;
     let currX1 = startX1;
 
     word1.forEach((char, idx) => {
@@ -847,12 +847,15 @@ function drawRetroPixelTitle(cx, topY) {
                     let bx = currX1 + c * p;
                     let by = topY + r * p;
 
+                    // Đổ bóng đậm bên dưới & bên phải tạo độ nổi 3D
                     ctx.fillStyle = '#000000';
                     ctx.fillRect(bx + 4, by + 4, p, p);
 
+                    // Màu chính của chữ
                     ctx.fillStyle = color;
                     ctx.fillRect(bx, by, p, p);
 
+                    // Viền nét sắc bén cho từng khối pixel
                     ctx.strokeStyle = '#2b221e';
                     ctx.lineWidth = 1.5;
                     ctx.strokeRect(bx, by, p, p);
@@ -862,10 +865,11 @@ function drawRetroPixelTitle(cx, topY) {
         currX1 += (grid[0].length + 1) * p;
     });
 
+    // Dòng 2: BIRD
     let word2 = ['B','I','R','D'];
-    let startX2 = cx - 80;
+    let startX2 = cx - 98;
     let currX2 = startX2;
-    let topY2 = topY + 38;
+    let topY2 = topY + 44;
 
     word2.forEach((char, idx) => {
         let grid = LETTER_PIXELS[char];
@@ -899,8 +903,8 @@ function drawMainMenu() {
     let titleX = canvas.width / 2;
     drawRetroPixelTitle(titleX, 90);
 
-    let floatY = 250 + Math.sin(frames * 0.08) * 8;
-    drawClassicPixelBird(canvas.width / 2, floatY, selectedSkin, 3.0);
+    let floatY = 270 + Math.sin(frames * 0.08) * 8;
+    drawClassicPixelBird(canvas.width / 2, floatY, selectedSkin, 3.2);
 
     drawMenuButton(menuPlayBtn, true);
     drawMenuButton(menuCharBtn, false);
