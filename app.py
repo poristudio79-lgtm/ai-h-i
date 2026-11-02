@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Clean Normal Map", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Music Toggle", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -36,11 +36,31 @@ game_html = """
     <canvas id="birdCanvas" width="480" height="640"></canvas>
 </div>
 
+<!-- THẺ AUDIO NHẠC NỀN FLAPPY BIRD -->
+<audio id="bgMusic" loop>
+    <source src="https://vgmsite.com/soundtracks/flappy-bird-mobile/flappy-bird-theme.mp3" type="audio/mpeg">
+</audio>
+
 <script>
 const canvas = document.getElementById('birdCanvas');
 const ctx = canvas.getContext('2d');
+const bgMusic = document.getElementById('bgMusic');
+bgMusic.volume = 0.4;
 
-// --- HỆ THỐNG ÂM THANH 8-BIT ---
+let isMusicPlaying = false;
+
+function toggleMusic() {
+    if (isMusicPlaying) {
+        bgMusic.pause();
+        isMusicPlaying = false;
+    } else {
+        bgMusic.play().then(() => {
+            isMusicPlaying = true;
+        }).catch(e => console.log("Audio play blocked", e));
+    }
+}
+
+// --- HỆ THỐNG ÂM THANH 8-BIT (HIỆU ỨNG NHẢY, ĂN ĐIỂM, THUA) ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
@@ -105,6 +125,9 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
+
+// Nút Bật/Tắt nhạc ở góc trên bên phải
+const musicBtn = { x: 410, y: 15, w: 55, h: 32 };
 
 // --- HÀM VẼ NHÂN VẬT ---
 function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
@@ -585,7 +608,6 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
 
         if (isTop) {
             let bodyH = Math.max(0, height - 44);
-            // Thân ống cống màu tím liền mạch, không còn vệt sọc dọc
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, 0, width, bodyH);
             ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, 0, width, bodyH);
@@ -712,6 +734,25 @@ function drawMenuButton(btn, isPlayBtn) {
     } else {
         drawClassicPixelBird(btn.x + btn.w / 2, btn.y + btn.h / 2, selectedSkin, 2.4);
     }
+}
+
+// --- VẼ NÚT BẬT / TẮT NHẠC GÓC TRÊN ---
+function drawMusicButton() {
+    ctx.save();
+    ctx.fillStyle = isMusicPlaying ? '#54cb37' : '#e83838';
+    ctx.strokeStyle = '#2b2b2b';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(musicBtn.x, musicBtn.y, musicBtn.w, musicBtn.h, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 12px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(isMusicPlaying ? '♪ BẬT' : '♪ TẮT', musicBtn.x + musicBtn.w / 2, musicBtn.y + musicBtn.h / 2);
+    ctx.restore();
 }
 
 // --- HÀM VẼ TIÊU ĐỀ 3D PIXEL RỰC RỠ ---
@@ -1037,6 +1078,8 @@ function drawUI() {
     } else if (gameState === 'GAMEOVER') {
         drawGameOverScreen();
     }
+    // Vẽ nút nhạc luôn xuất hiện ở mọi màn hình
+    drawMusicButton();
 }
 
 function triggerGameOver() {
@@ -1071,6 +1114,13 @@ function handleInteraction(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const clickX = clientX - rect.left;
     const clickY = clientY - rect.top;
+
+    // Kiểm tra bấm nút Bật/Tắt Nhạc (ưu tiên cao nhất)
+    if (clickX >= musicBtn.x && clickX <= musicBtn.x + musicBtn.w &&
+        clickY >= musicBtn.y && clickY <= musicBtn.y + musicBtn.h) {
+        toggleMusic();
+        return;
+    }
 
     if (gameState === 'START') {
         if (clickX >= menuPlayBtn.x && clickX <= menuPlayBtn.x + menuPlayBtn.w &&
