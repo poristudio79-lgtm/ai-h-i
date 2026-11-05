@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Exact Logo Style", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Clean Title", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -812,120 +812,99 @@ function drawMusicButton() {
     ctx.restore();
 }
 
-// --- HÀM VẼ TIÊU ĐỀ CHUẨN MẪU GỐC ---
+// --- HÀM VẼ TIÊU ĐỀ KHÔNG NỀN (CHỈ CÓ NÉT CHỮ PIXEL ART NỔI BẬT) ---
 function drawRetroPixelTitle(cx, topY) {
     ctx.save();
-    const scale = 2.4; 
+    const p = 6; // Kích thước pixel cực to & rõ ràng
 
-    const letterData = {
-        'F': { w: 18, h: 26, dark: '#c48e00', light: '#fcd828',
-               map: [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
-        'L': { w: 18, h: 26, dark: '#b02462', light: '#f44a8e',
-               map: [[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]] },
-        'A': { w: 20, h: 26, dark: '#289898', light: '#74d8e8',
-               map: [[0,1,1,1,0],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1]] },
-        'P1': { w: 19, h: 26, dark: '#2430b0', light: '#506cf4',
-               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
-        'P2': { w: 19, h: 26, dark: '#2430b0', light: '#506cf4',
-               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
-        'Y': { w: 20, h: 26, dark: '#46a420', light: '#76d63c',
-               map: [[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0],[0,0,1,0,0],[0,0,1,0,0]] },
-
-        'B': { w: 22, h: 26, dark: '#7420a4', light: '#a642e8',
-               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0]] },
-        'I': { w: 16, h: 26, dark: '#b48a18', light: '#fcd828',
-               map: [[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]] },
-        'R': { w: 22, h: 26, dark: '#b02462', light: '#f44a8e',
-               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,1,0],[1,0,0,0,1]] },
-        'D': { w: 22, h: 26, dark: '#289898', light: '#74d8e8',
-               map: [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0]] }
+    const LETTER_PIXELS = {
+        'F': [[1,1,1,1],[1,0,0,0],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
+        'L': [[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,1,1,1]],
+        'A': [[0,1,1,0],[1,0,0,1],[1,1,1,1],[1,0,0,1],[1,0,0,1]],
+        'P': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
+        'Y': [[1,0,0,1],[1,0,0,1],[0,1,1,0],[0,1,0,0],[0,1,0,0]],
+        'B': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,1],[1,1,1,0]],
+        'I': [[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]],
+        'R': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,1,0],[1,0,0,1]],
+        'D': [[1,1,1,0],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,0]]
     };
 
-    function drawSingleBoxLetter(charKey, x, y) {
-        let item = letterData[charKey];
-        let bw = item.w * scale;
-        let bh = item.h * scale;
+    const word1Colors = ['#f8d038', '#f85820', '#e82878', '#a038d0', '#38a8b8', '#509848'];
+    const word2Colors = ['#a038d0', '#f8d038', '#f85820', '#38a8b8'];
 
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(x, y, bw, bh);
+    // Dòng 1: FLAPPY
+    let word1 = ['F','L','A','P','P','Y'];
+    let startX1 = cx - 162;
+    let currX1 = startX1;
 
-        let innerPadding = 3.5;
-        let ix = x + innerPadding;
-        let iy = y + innerPadding;
-        let iw = bw - innerPadding * 2;
-        let ih = bh - innerPadding * 2;
-        let halfH = ih / 2;
+    word1.forEach((char, idx) => {
+        let grid = LETTER_PIXELS[char];
+        let color = word1Colors[idx % word1Colors.length];
 
-        ctx.fillStyle = item.light;
-        ctx.fillRect(ix, iy, iw, halfH);
+        for (let r = 0; r < grid.length; r++) {
+            for (let c = 0; c < grid[r].length; c++) {
+                if (grid[r][c] === 1) {
+                    let bx = currX1 + c * p;
+                    let by = topY + r * p;
 
-        ctx.fillStyle = item.dark;
-        ctx.fillRect(ix, iy + halfH, iw, halfH);
-
-        let map = item.map;
-        let rows = map.length;
-        let cols = map[0].length;
-        let pxW = (iw - 4) / cols;
-        let pxH = (ih - 4) / rows;
-        let startPxX = ix + 2;
-        let startPxY = iy + 2;
-
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (map[r][c] === 1) {
-                    let px = startPxX + c * pxW;
-                    let py = startPxY + r * pxH;
-                    
+                    // 1. Đổ bóng đen 3D phía sau nét chữ
                     ctx.fillStyle = '#000000';
-                    ctx.fillRect(px, py, pxW + 0.5, pxH + 0.5);
+                    ctx.fillRect(bx + 4, by + 4, p, p);
 
-                    let halfRow = rows / 2;
-                    ctx.fillStyle = (r < halfRow) ? item.dark : item.light;
-                    ctx.fillRect(px + 1, py + 1, Math.max(1, pxW - 2), Math.max(1, pxH - 2));
+                    // 2. Màu sắc rực rỡ của từng khối Pixel chữ
+                    ctx.fillStyle = color;
+                    ctx.fillRect(bx, by, p, p);
+
+                    // 3. Viền nét đen sắc bén bọc quanh từng nét chữ
+                    ctx.strokeStyle = '#2b221e';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(bx, by, p, p);
                 }
             }
         }
-
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(x, y, bw, bh);
-    }
-
-    let line1 = ['F', 'L', 'A', 'P1', 'P2', 'Y'];
-    let totalW1 = line1.reduce((sum, key) => sum + letterData[key].w * scale, 0);
-    let startX1 = cx - totalW1 / 2;
-    let curX1 = startX1;
-
-    line1.forEach(key => {
-        drawSingleBoxLetter(key, curX1, topY);
-        curX1 += letterData[key].w * scale;
+        currX1 += (grid[0].length + 1) * p;
     });
 
-    let line2 = ['B', 'I', 'R', 'D'];
-    let totalW2 = line2.reduce((sum, key) => sum + letterData[key].w * scale, 0);
-    let startX2 = cx - totalW2 / 2;
-    let curX2 = startX2;
-    let topY2 = topY + 26 * scale + 2;
+    // Dòng 2: BIRD
+    let word2 = ['B','I','R','D'];
+    let startX2 = cx - 98;
+    let currX2 = startX2;
+    let topY2 = topY + 44;
 
-    line2.forEach(key => {
-        drawSingleBoxLetter(key, curX2, topY2);
-        curX2 += letterData[key].w * scale;
+    word2.forEach((char, idx) => {
+        let grid = LETTER_PIXELS[char];
+        let color = word2Colors[idx % word2Colors.length];
+
+        for (let r = 0; r < grid.length; r++) {
+            for (let c = 0; c < grid[r].length; c++) {
+                if (grid[r][c] === 1) {
+                    let bx = currX2 + c * p;
+                    let by = topY2 + r * p;
+
+                    // 1. Đổ bóng đen 3D
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(bx + 4, by + 4, p, p);
+
+                    // 2. Màu chính của nét chữ
+                    ctx.fillStyle = color;
+                    ctx.fillRect(bx, by, p, p);
+
+                    // 3. Viền đen sắc nét
+                    ctx.strokeStyle = '#2b221e';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(bx, by, p, p);
+                }
+            }
+        }
+        currX2 += (grid[0].length + 1) * p;
     });
-
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.strokeText('®', curX2 + 4, topY2 + 26 * scale - 4);
-    ctx.fillText('®', curX2 + 4, topY2 + 26 * scale - 4);
 
     ctx.restore();
 }
 
 function drawMainMenu() {
     let titleX = canvas.width / 2;
-    drawRetroPixelTitle(titleX, 75);
+    drawRetroPixelTitle(titleX, 90);
 
     let floatY = 275 + Math.sin(frames * 0.08) * 8;
     drawClassicPixelBird(canvas.width / 2, floatY, selectedSkin, 3.2);
