@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Classic Logo Style", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Exact Logo Style", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -673,7 +673,7 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             let bodyY = y + 44;
             let bodyH = Math.max(0, canvas.height - bodyY);
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
-            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
+            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
             drawPurpleFistGlove(x, y, width, false);
@@ -812,12 +812,11 @@ function drawMusicButton() {
     ctx.restore();
 }
 
-// --- HÀM VẼ TIÊU ĐỀ KHÔI PHỤC THEO ĐÚNG CHUẨN LOGO FLAPPY BIRD CHÍNH HÃNG ---
+// --- HÀM VẼ TIÊU ĐỀ CHUẨN MẪU GỐC ---
 function drawRetroPixelTitle(cx, topY) {
     ctx.save();
     const scale = 2.4; 
 
-    // Cấu hình các chữ cái trong từ FLAPPY & BIRD (Kích thước, Màu sẫm bên dưới, Màu sáng bên trên, Bitmap)
     const letterData = {
         'F': { w: 18, h: 26, dark: '#c48e00', light: '#fcd828',
                map: [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
@@ -847,11 +846,9 @@ function drawRetroPixelTitle(cx, topY) {
         let bw = item.w * scale;
         let bh = item.h * scale;
 
-        // 1. Vẽ Viền Khung Đen Ngoài
         ctx.fillStyle = '#000000';
         ctx.fillRect(x, y, bw, bh);
 
-        // 2. Vẽ Nền Tô 2 Tông Màu (Nửa Dưới Màu Tối, Nửa Trên Màu Sáng)
         let innerPadding = 3.5;
         let ix = x + innerPadding;
         let iy = y + innerPadding;
@@ -865,7 +862,6 @@ function drawRetroPixelTitle(cx, topY) {
         ctx.fillStyle = item.dark;
         ctx.fillRect(ix, iy + halfH, iw, halfH);
 
-        // 3. Vẽ Chữ Cái Pixel Nổi Trên Nền
         let map = item.map;
         let rows = map.length;
         let cols = map[0].length;
@@ -890,13 +886,11 @@ function drawRetroPixelTitle(cx, topY) {
             }
         }
 
-        // Viền Khung Sắc Nét
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = 4;
         ctx.strokeRect(x, y, bw, bh);
     }
 
-    // Dòng 1: FLAPPY
     let line1 = ['F', 'L', 'A', 'P1', 'P2', 'Y'];
     let totalW1 = line1.reduce((sum, key) => sum + letterData[key].w * scale, 0);
     let startX1 = cx - totalW1 / 2;
@@ -907,7 +901,6 @@ function drawRetroPixelTitle(cx, topY) {
         curX1 += letterData[key].w * scale;
     });
 
-    // Dòng 2: BIRD
     let line2 = ['B', 'I', 'R', 'D'];
     let totalW2 = line2.reduce((sum, key) => sum + letterData[key].w * scale, 0);
     let startX2 = cx - totalW2 / 2;
@@ -919,7 +912,6 @@ function drawRetroPixelTitle(cx, topY) {
         curX2 += letterData[key].w * scale;
     });
 
-    // Ký hiệu ® góc dưới
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
