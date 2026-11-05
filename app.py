@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Flappy Bird - Big Title", layout="centered")
+st.set_page_config(page_title="Flappy Bird - Classic Logo Style", layout="centered")
 
 game_html = """
 <!DOCTYPE html>
@@ -141,8 +141,8 @@ const CHARACTERS = [
     { id: 6, name: 'BASKETBALL', color: '#f86820', effect: 'Đuôi Lửa Cháy' }
 ];
 
-const menuPlayBtn = { x: 75, y: 430, w: 145, h: 80 };
-const menuCharBtn = { x: 260, y: 430, w: 145, h: 80 };
+const menuPlayBtn = { x: 75, y: 440, w: 145, h: 80 };
+const menuCharBtn = { x: 260, y: 440, w: 145, h: 80 };
 
 const diffEasyBtn = { x: 100, y: 220, w: 280, h: 65 };   
 const diffNormalBtn = { x: 100, y: 305, w: 280, h: 65 }; 
@@ -152,7 +152,7 @@ const diffBackBtn = { x: 100, y: 480, w: 280, h: 50 };
 const gameOverOkBtn = { x: 75, y: 470, w: 145, h: 55 };
 const gameOverShareBtn = { x: 260, y: 470, w: 145, h: 55 };
 
-const musicBtn = { x: 170, y: 12, w: 140, h: 42 };
+const musicBtn = { x: 170, y: 10, w: 140, h: 40 };
 
 // --- HÀM VẼ NHÂN VẬT ---
 function drawClassicPixelBird(x, y, skinId, scale = 2.3, rotation = 0) {
@@ -673,7 +673,7 @@ function drawPipesByTheme(x, y, width, height, isTop, difficulty) {
             let bodyY = y + 44;
             let bodyH = Math.max(0, canvas.height - bodyY);
             ctx.fillStyle = colMainPurple; ctx.fillRect(x, bodyY, width, bodyH);
-            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, bodyY, 12, bodyH);
+            ctx.fillStyle = colDarkPurple; ctx.fillRect(x + width - 12, 0, 12, bodyH);
             ctx.strokeStyle = colDarkBorder; ctx.lineWidth = 3; ctx.strokeRect(x, bodyY, width, bodyH);
 
             drawPurpleFistGlove(x, y, width, false);
@@ -812,98 +812,130 @@ function drawMusicButton() {
     ctx.restore();
 }
 
-// --- HÀM VẼ TIÊU ĐỀ 3D PIXEL RẤT TO, SẮC NÉT VÀ ĐẸP MẮT ---
+// --- HÀM VẼ TIÊU ĐỀ KHÔI PHỤC THEO ĐÚNG CHUẨN LOGO FLAPPY BIRD CHÍNH HÃNG ---
 function drawRetroPixelTitle(cx, topY) {
     ctx.save();
-    const p = 6; // Tăng kích thước điểm pixel (scale lớn hơn)
+    const scale = 2.4; 
 
-    const LETTER_PIXELS = {
-        'F': [[1,1,1,1],[1,0,0,0],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
-        'L': [[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,0,0,0],[1,1,1,1]],
-        'A': [[0,1,1,0],[1,0,0,1],[1,1,1,1],[1,0,0,1],[1,0,0,1]],
-        'P': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,0],[1,0,0,0]],
-        'Y': [[1,0,0,1],[1,0,0,1],[0,1,1,0],[0,1,0,0],[0,1,0,0]],
-        'B': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,0,1],[1,1,1,0]],
-        'I': [[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]],
-        'R': [[1,1,1,0],[1,0,0,1],[1,1,1,0],[1,0,1,0],[1,0,0,1]],
-        'D': [[1,1,1,0],[1,0,0,1],[1,0,0,1],[1,0,0,1],[1,1,1,0]]
+    // Cấu hình các chữ cái trong từ FLAPPY & BIRD (Kích thước, Màu sẫm bên dưới, Màu sáng bên trên, Bitmap)
+    const letterData = {
+        'F': { w: 18, h: 26, dark: '#c48e00', light: '#fcd828',
+               map: [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
+        'L': { w: 18, h: 26, dark: '#b02462', light: '#f44a8e',
+               map: [[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]] },
+        'A': { w: 20, h: 26, dark: '#289898', light: '#74d8e8',
+               map: [[0,1,1,1,0],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1]] },
+        'P1': { w: 19, h: 26, dark: '#2430b0', light: '#506cf4',
+               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
+        'P2': { w: 19, h: 26, dark: '#2430b0', light: '#506cf4',
+               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0]] },
+        'Y': { w: 20, h: 26, dark: '#46a420', light: '#76d63c',
+               map: [[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0],[0,0,1,0,0],[0,0,1,0,0]] },
+
+        'B': { w: 22, h: 26, dark: '#7420a4', light: '#a642e8',
+               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0]] },
+        'I': { w: 16, h: 26, dark: '#b48a18', light: '#fcd828',
+               map: [[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]] },
+        'R': { w: 22, h: 26, dark: '#b02462', light: '#f44a8e',
+               map: [[1,1,1,1,0],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,1,0],[1,0,0,0,1]] },
+        'D': { w: 22, h: 26, dark: '#289898', light: '#74d8e8',
+               map: [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0]] }
     };
 
-    const word1Colors = ['#f8d038', '#f85820', '#e82878', '#a038d0', '#38a8b8', '#509848'];
-    const word2Colors = ['#a038d0', '#f8d038', '#f85820', '#38a8b8'];
+    function drawSingleBoxLetter(charKey, x, y) {
+        let item = letterData[charKey];
+        let bw = item.w * scale;
+        let bh = item.h * scale;
 
-    // Dòng 1: FLAPPY
-    let word1 = ['F','L','A','P','P','Y'];
-    let startX1 = cx - 162;
-    let currX1 = startX1;
+        // 1. Vẽ Viền Khung Đen Ngoài
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(x, y, bw, bh);
 
-    word1.forEach((char, idx) => {
-        let grid = LETTER_PIXELS[char];
-        let color = word1Colors[idx % word1Colors.length];
+        // 2. Vẽ Nền Tô 2 Tông Màu (Nửa Dưới Màu Tối, Nửa Trên Màu Sáng)
+        let innerPadding = 3.5;
+        let ix = x + innerPadding;
+        let iy = y + innerPadding;
+        let iw = bw - innerPadding * 2;
+        let ih = bh - innerPadding * 2;
+        let halfH = ih / 2;
 
-        for (let r = 0; r < grid.length; r++) {
-            for (let c = 0; c < grid[r].length; c++) {
-                if (grid[r][c] === 1) {
-                    let bx = currX1 + c * p;
-                    let by = topY + r * p;
+        ctx.fillStyle = item.light;
+        ctx.fillRect(ix, iy, iw, halfH);
 
-                    // Đổ bóng đậm bên dưới & bên phải tạo độ nổi 3D
+        ctx.fillStyle = item.dark;
+        ctx.fillRect(ix, iy + halfH, iw, halfH);
+
+        // 3. Vẽ Chữ Cái Pixel Nổi Trên Nền
+        let map = item.map;
+        let rows = map.length;
+        let cols = map[0].length;
+        let pxW = (iw - 4) / cols;
+        let pxH = (ih - 4) / rows;
+        let startPxX = ix + 2;
+        let startPxY = iy + 2;
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (map[r][c] === 1) {
+                    let px = startPxX + c * pxW;
+                    let py = startPxY + r * pxH;
+                    
                     ctx.fillStyle = '#000000';
-                    ctx.fillRect(bx + 4, by + 4, p, p);
+                    ctx.fillRect(px, py, pxW + 0.5, pxH + 0.5);
 
-                    // Màu chính của chữ
-                    ctx.fillStyle = color;
-                    ctx.fillRect(bx, by, p, p);
-
-                    // Viền nét sắc bén cho từng khối pixel
-                    ctx.strokeStyle = '#2b221e';
-                    ctx.lineWidth = 1.5;
-                    ctx.strokeRect(bx, by, p, p);
+                    let halfRow = rows / 2;
+                    ctx.fillStyle = (r < halfRow) ? item.dark : item.light;
+                    ctx.fillRect(px + 1, py + 1, Math.max(1, pxW - 2), Math.max(1, pxH - 2));
                 }
             }
         }
-        currX1 += (grid[0].length + 1) * p;
+
+        // Viền Khung Sắc Nét
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(x, y, bw, bh);
+    }
+
+    // Dòng 1: FLAPPY
+    let line1 = ['F', 'L', 'A', 'P1', 'P2', 'Y'];
+    let totalW1 = line1.reduce((sum, key) => sum + letterData[key].w * scale, 0);
+    let startX1 = cx - totalW1 / 2;
+    let curX1 = startX1;
+
+    line1.forEach(key => {
+        drawSingleBoxLetter(key, curX1, topY);
+        curX1 += letterData[key].w * scale;
     });
 
     // Dòng 2: BIRD
-    let word2 = ['B','I','R','D'];
-    let startX2 = cx - 98;
-    let currX2 = startX2;
-    let topY2 = topY + 44;
+    let line2 = ['B', 'I', 'R', 'D'];
+    let totalW2 = line2.reduce((sum, key) => sum + letterData[key].w * scale, 0);
+    let startX2 = cx - totalW2 / 2;
+    let curX2 = startX2;
+    let topY2 = topY + 26 * scale + 2;
 
-    word2.forEach((char, idx) => {
-        let grid = LETTER_PIXELS[char];
-        let color = word2Colors[idx % word2Colors.length];
-
-        for (let r = 0; r < grid.length; r++) {
-            for (let c = 0; c < grid[r].length; c++) {
-                if (grid[r][c] === 1) {
-                    let bx = currX2 + c * p;
-                    let by = topY2 + r * p;
-
-                    ctx.fillStyle = '#000000';
-                    ctx.fillRect(bx + 4, by + 4, p, p);
-
-                    ctx.fillStyle = color;
-                    ctx.fillRect(bx, by, p, p);
-
-                    ctx.strokeStyle = '#2b221e';
-                    ctx.lineWidth = 1.5;
-                    ctx.strokeRect(bx, by, p, p);
-                }
-            }
-        }
-        currX2 += (grid[0].length + 1) * p;
+    line2.forEach(key => {
+        drawSingleBoxLetter(key, curX2, topY2);
+        curX2 += letterData[key].w * scale;
     });
+
+    // Ký hiệu ® góc dưới
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2;
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.strokeText('®', curX2 + 4, topY2 + 26 * scale - 4);
+    ctx.fillText('®', curX2 + 4, topY2 + 26 * scale - 4);
 
     ctx.restore();
 }
 
 function drawMainMenu() {
     let titleX = canvas.width / 2;
-    drawRetroPixelTitle(titleX, 90);
+    drawRetroPixelTitle(titleX, 75);
 
-    let floatY = 270 + Math.sin(frames * 0.08) * 8;
+    let floatY = 275 + Math.sin(frames * 0.08) * 8;
     drawClassicPixelBird(canvas.width / 2, floatY, selectedSkin, 3.2);
 
     drawMenuButton(menuPlayBtn, true);
